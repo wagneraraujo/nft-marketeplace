@@ -22,7 +22,7 @@ async function login(page: Page, email = 'alex@example.com') {
   await page.getByRole('button', { name: 'Entrar', exact: true }).click()
   await expect(
     page.getByTitle('Meu perfil').filter({ visible: true }),
-  ).toBeVisible()
+  ).toHaveText(email === 'sam@example.com' ? 'S' : 'A')
 }
 async function signOut(page: Page) {
   const button = page
@@ -35,6 +35,9 @@ async function signOut(page: Page) {
     .filter({ visible: true })
     .first()
     .click()
+  await expect(
+    page.getByRole('link', { name: 'Entrar', exact: true }),
+  ).toBeVisible()
 }
 async function addToCart(page: Page) {
   await page.goto('/nfts/nft-1')
@@ -406,8 +409,244 @@ test('detalhe lento reserva o espaço da imagem antes dos dados', async ({
   const image = await page.locator('.detail-art').boundingBox()
   expect(reserved).not.toBeNull()
   expect(image).not.toBeNull()
+  expect(Math.abs((reserved?.x ?? 0) - (image?.x ?? 0))).toBeLessThan(1)
+  expect(Math.abs((reserved?.y ?? 0) - (image?.y ?? 0))).toBeLessThan(1)
   expect(Math.abs((reserved?.width ?? 0) - (image?.width ?? 0))).toBeLessThan(1)
   expect(Math.abs((reserved?.height ?? 0) - (image?.height ?? 0))).toBeLessThan(
     1,
   )
+})
+
+test('cupom recalcula a cotação e exige revisão dos novos valores', async ({
+  page,
+}) => {
+  await login(page)
+  await addToCart(page)
+  await checkout(page)
+  await page.getByLabel('Cupom', { exact: true }).fill('ART10')
+  await page.getByRole('button', { name: 'Aplicar', exact: true }).click()
+  await expect(page.getByText('1.097775 ETH', { exact: true })).toBeVisible()
+  await expect(page.getByRole('checkbox')).not.toBeChecked()
+  await expect(
+    page.getByRole('button', { name: 'Confirmar compra' }),
+  ).toBeDisabled()
+  await page.getByLabel('Cupom', { exact: true }).fill('EXPIRED')
+  await page.getByRole('button', { name: 'Aplicar', exact: true }).click()
+  await expect(
+    page.getByText('Este cupom expirou.', { exact: true }),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('button', { name: 'Confirmar compra' }),
+  ).toBeDisabled()
+  await page.getByLabel('Cupom', { exact: true }).fill('')
+  await page.getByRole('button', { name: 'Aplicar', exact: true }).click()
+  await expect(page.getByText('1.21975 ETH', { exact: true })).toBeVisible()
+})
+
+test('sessão expirada no checkout preserva destino e itens após autenticar', async ({
+  page,
+}) => {
+  await login(page)
+  await addToCart(page)
+  await checkout(page)
+  await control(page, 'scenario', { scenario: 'expired-session' })
+  await page.getByRole('button', { name: 'Atualizar cotação' }).click()
+  await expect(page).toHaveURL(/\/login\?/)
+  expect(new URL(page.url()).searchParams.get('redirect')).toBe('/checkout')
+  await control(page, 'scenario', { scenario: 'success' })
+  await page.getByLabel('E-mail', { exact: true }).fill('alex@example.com')
+  await page.getByLabel('Senha', { exact: true }).fill('Demo1234!')
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click()
+  await expect(page).toHaveURL(/\/checkout$/)
+  await expect(page.getByText('1.21975 ETH', { exact: true })).toBeVisible()
+  await expect(page.getByRole('checkbox')).not.toBeChecked()
+  await expect(
+    page.getByRole('button', { name: 'Confirmar compra' }),
+  ).toBeDisabled()
+})
+
+test('reconexão recupera mudança perdida e evento antigo não invalida revisão', async ({
+  page,
+}) => {
+  await login(page)
+  await addToCart(page)
+  await checkout(page)
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.documentElement.dataset.connection),
+    )
+    .toBe('online')
+  await control(page, 'event', { disconnect: true })
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.documentElement.dataset.connection),
+    )
+    .toBe('offline')
+  await control(page, 'event', { id: 'nft-1' })
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.documentElement.dataset.connection),
+    )
+    .toBe('online')
+  await expect(
+    page
+      .getByText('0.99 ETH', { exact: false })
+      .filter({ visible: true })
+      .first(),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('button', { name: 'Confirmar compra' }),
+  ).toBeDisabled()
+  // Reload clears the client's event-version map; REST must still reject an older first event.
+  await page.reload()
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.documentElement.dataset.connection),
+    )
+    .toBe('online')
+  await page.getByRole('radio', { name: /Minha carteira/ }).check()
+  await page.getByRole('checkbox').check()
+  await expect(
+    page.getByRole('button', { name: 'Confirmar compra' }),
+  ).toBeEnabled()
+  const unexpectedQuote = page
+    .waitForRequest(
+      (request) =>
+        request.url().endsWith('/api/quotes') && request.method() === 'POST',
+      { timeout: 1200 },
+    )
+    .then(
+      () => true,
+      () => false,
+    )
+  await control(page, 'event', { id: 'nft-1', stale: true })
+  expect(await unexpectedQuote).toBe(false)
+  await expect(page.getByRole('checkbox')).toBeChecked()
+  await expect(
+    page.getByRole('button', { name: 'Confirmar compra' }),
+  ).toBeEnabled()
+})
+
+test('conhecer o ID de um pedido não permite acessar o recibo de outra conta', async ({
+  page,
+}) => {
+  await login(page)
+  await addToCart(page)
+  await checkout(page)
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
+  await expect(
+    page.getByRole('heading', {
+      name: 'A obra agora faz parte da sua coleção.',
+    }),
+  ).toBeVisible()
+  const receipt = page.url()
+  await page.getByRole('button', { name: 'Fechar recibo' }).click()
+  await expect(page).toHaveURL(/\/orders$/)
+  await signOut(page)
+  await login(page, 'sam@example.com')
+  await page.goto(receipt)
+  await expect(
+    page.getByText('Pedido não encontrado.', { exact: true }),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'Recibo da compra' }),
+  ).toHaveCount(0)
+  await expect(page.getByText('1.21975 ETH', { exact: true })).toHaveCount(0)
+})
+
+test('avatar valida limite de arquivo e persiste após atualizar a página', async ({
+  page,
+}) => {
+  await login(page)
+  await page.goto('/profile')
+  const file = page.getByLabel('Selecionar imagem do perfil', { exact: true })
+  await file.setInputFiles({
+    name: 'large.png',
+    mimeType: 'image/png',
+    buffer: Buffer.alloc(1024 * 1024 + 1),
+  })
+  await expect(
+    page.getByText('Use uma imagem de até 1 MB.', { exact: true }),
+  ).toBeVisible()
+  await file.setInputFiles({
+    name: 'avatar.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGO41OUDAAPaAakDehmdAAAAAElFTkSuQmCC',
+      'base64',
+    ),
+  })
+  await expect(page.getByAltText('Seu avatar', { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Salvar perfil' }).click()
+  await expect(
+    page.getByText('Perfil atualizado.', { exact: true }),
+  ).toBeVisible()
+  await page.reload()
+  await expect(
+    page.getByAltText('Seu avatar', { exact: true }),
+  ).toHaveAttribute('src', /^data:image\/png;base64,/)
+})
+
+test('troca de senha valida a senha atual e permite novo login', async ({
+  page,
+}) => {
+  await login(page)
+  await page.goto('/profile')
+  await page.getByLabel(/^Senha atual/).fill('WrongPassword123!')
+  await page
+    .getByLabel('Nova senha', { exact: true })
+    .fill('ChangedPassword123!')
+  await page
+    .getByLabel('Confirmar nova senha', { exact: true })
+    .fill('ChangedPassword123!')
+  await page.getByRole('button', { name: 'Alterar senha', exact: true }).click()
+  await expect(page.locator('#currentPassword-error')).toHaveText(
+    'Senha atual incorreta.',
+  )
+  await page.getByLabel(/^Senha atual/).fill('Demo1234!')
+  await page.getByRole('button', { name: 'Alterar senha', exact: true }).click()
+  await expect(page.getByText('Senha alterada.', { exact: true })).toBeVisible()
+  await signOut(page)
+  await page.goto('/login')
+  await page.getByLabel('E-mail', { exact: true }).fill('alex@example.com')
+  await page.getByLabel(/^Senha/).fill('Demo1234!')
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click()
+  await expect(page.locator('#password-error')).toHaveText(
+    'E-mail ou senha incorretos.',
+  )
+  await page.getByLabel(/^Senha/).fill('ChangedPassword123!')
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click()
+  await expect(
+    page.getByTitle('Meu perfil').filter({ visible: true }),
+  ).toHaveText('A')
+})
+
+test('diálogo de acesso mantém o fundo inerte e fecha com Escape', async ({
+  page,
+}) => {
+  await page.goto('/login')
+  const dialog = page.getByRole('dialog')
+  await expect(dialog).toBeVisible()
+  await dialog.getByRole('button', { name: 'Fechar', exact: true }).focus()
+  for (let index = 0; index < 3; index++) {
+    await page.keyboard.press('Tab')
+    expect(
+      await page.evaluate(() =>
+        document.activeElement?.closest('dialog')?.matches(':modal'),
+      ),
+    ).toBe(true)
+  }
+  // Native dialogs may transfer the final Tab to browser chrome, but background
+  // controls must stay inert. Do not replace native behavior with a custom trap.
+  await page
+    .locator('.skip-link')
+    .evaluate((element) => (element as HTMLElement).focus())
+  expect(
+    await page.evaluate(() =>
+      document.activeElement?.closest('dialog')?.matches(':modal'),
+    ),
+  ).toBe(true)
+  await page.keyboard.press('Escape')
+  await expect.poll(() => new URL(page.url()).pathname).toBe('/')
+  await expect(page.getByRole('dialog')).toHaveCount(0)
 })

@@ -1,9 +1,10 @@
-# Kurio verification — 2026-10-31
+# Kurio verification — phase10 continuation
 
-- Complete Playwright run: `npm run test:e2e -- --workers=4 --fully-parallel` → **36 passed in 1.4 minutes**.
-- 32 business scenarios, 2 evidence cases and 2 visual cases comparing 8 versioned baselines.
-- Evidence matrix: 1440 desktop, 414 mobile, 768 tablet. Business project additionally exercises 390 mobile.
-- TypeScript, ESLint, production build, source/test formatting and whitespace checks passed.
-- Original Figma context for 15 frames and 137 original assets available. Captures use actual application data; old local prices and immutable receipts are preserved.
-- Visual reviewer resolved fixes 1–7; fix 8 remains a documented parent source-authority exception for the literal Figma hero welcome. No whole-surface reviewer pass or native pixel equality is claimed.
-- Historical Lighthouse results do not measure this theme. Deployment not performed in this visual-adaptation phase.
+- Full Playwright run:50 passed,46 functional +2 evidence +2 visual cases, comparing8 versioned baselines. Final post-determinism confirmation recorded in the execution log.
+- Evidence:1440 desktop,414 mobile,768 tablet; functional mobile additionally390.
+- TypeScript, ESLint, production build, source/test/script formatting and whitespace checks passed.
+- Clean offline installation and build passed; all206 local/isolated dist files match byte for byte. Manifest SHA-256: `2d83a0a5c9d4bc70cbe4a056f46bfa0ec9ed88852be477f6c8175b56eaed1789`.
+- Original Figma PNGs remain intact; responsive WebP variants use quality90. Current screenshots were inspected; unknown historical image paths retain original URLs in the helper.
+- Lighthouse12-run matrix: Performance99 desktop,86/86 mobile; A/BP/SEO100; CLS0. Mobile target90 remains unmet. See lighthouse/RESULTS.md.
+- Optimization code reviewed read-only without actionable findings; supplemental review scope/limits in PHASE10.md. No whole-surface visual pass is claimed; literalFigma hero welcome exception remains recorded.
+- Deployment candidate prepared for the original team; publication blocked by missing team grant403. No alternate account/scope used.

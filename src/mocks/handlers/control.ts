@@ -25,17 +25,19 @@ export const controlHandlers = [
       disconnectClients()
       return HttpResponse.json({ ok: true })
     }
-    if (input.duplicate !== true) {
+    if (input.duplicate !== true && input.stale !== true) {
       nft.version++
       nft.price = input.soldOut === true ? nft.price : '0.99'
       if (input.soldOut === true) nft.stock = 0
       save()
     }
+    const version =
+      input.stale === true ? Math.max(0, nft.version - 1) : nft.version
     const event = {
       type: 'nft.updated' as const,
-      eventId: `${nft.id}:${nft.version}`,
+      eventId: `${nft.id}:${version}`,
       resourceId: nft.id,
-      version: nft.version,
+      version,
     }
     emit(event)
     return HttpResponse.json(event)

@@ -77,8 +77,8 @@ Build: `yarn build`; saída: `dist`; variável: `VITE_ENABLE_MOCKS=true`. `verce
 
 ## Verificação realizada
 
-Typecheck, lint, formato e build aprovados após a adaptação. Playwright: **36 testes aprovados** em uma execução completa, com 32 cenários funcionais, 2 de evidência e 2 visuais que comparam oito baselines. Verificação em 390/414/768/1440 px. O helper dos testes aguarda a inicialização do MSW antes de usar os endpoints de controle.
+Typecheck, lint, formato e build aprovados após a adaptação. Playwright: **50 testes aprovados** em uma execução completa, com 46 cenários funcionais, 2 de evidência e 2 visuais que comparam oito baselines. Verificação em 390/414/768/1440 px. O helper dos testes aguarda a inicialização do MSW antes de usar os endpoints de controle.
 
-[Resultados Lighthouse históricos](lighthouse/RESULTS.md) pertencem à versão provisória e não medem a identidade Kurio: desktop 100 nas duas páginas; mobile 90 no início e 88 no detalhe. Accessibility, Best Practices e SEO 100 naquela versão.
+[Resultados Lighthouse Kurio](lighthouse/RESULTS.md): 12 medições do mesmo build, com medianas de desempenho 99 em desktop, 86 no início mobile e 86 no detalhe mobile. Accessibility, Best Practices e SEO: 100 nas quatro combinações. CLS: zero. A meta de desempenho mobile ≥90 permanece pendente; os relatórios incluem justificativa e comparação com a versão Kurio anterior à otimização.
 
 O deploy público aguarda autorização da integração para a equipe Vercel. A adaptação Kurio está aplicada, com 21 capturas de evidência em desktop/mobile/tablet e oito baselines versionados. A revisão resolveu sete correções materiais; o texto de boas-vindas presente no Figma foi preservado como exceção documentada à regra genérica do reviewer.
