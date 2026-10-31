@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'public/mockServiceWorker.js', 'src/routeTree.gen.ts']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -19,4 +19,6 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  { files: ['src/routes/**/*.tsx'], rules: { 'react-refresh/only-export-components': 'off' } },
+  { files: ['src/components/ui/button.tsx'], rules: { 'react-refresh/only-export-components': ['error', { allowConstantExport: true, allowExportNames: ['buttonVariants'] }] } },
 ])
