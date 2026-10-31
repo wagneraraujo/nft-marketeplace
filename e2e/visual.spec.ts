@@ -9,7 +9,7 @@ test('visual: início, detalhe, carrinho e pagamento', async ({ page }) => {
   })
   await page.goto('/nfts/nft-1')
   await expect(
-    page.getByRole('heading', { name: 'Orbital dream #001' }),
+    page.getByRole('heading', { name: 'Emerald Ape #042' }),
   ).toBeVisible()
   await expect(page).toHaveScreenshot('detail.png', {
     fullPage: true,
@@ -27,7 +27,9 @@ test('visual: início, detalhe, carrinho e pagamento', async ({ page }) => {
   await page.getByLabel('E-mail', { exact: true }).fill('alex@example.com')
   await page.getByLabel('Senha', { exact: true }).fill('Demo1234!')
   await page.getByRole('button', { name: 'Entrar', exact: true }).click()
-  await expect(page.getByTitle('Meu perfil')).toBeVisible()
+  await expect(
+    page.getByTitle('Meu perfil').filter({ visible: true }),
+  ).toBeVisible()
   await page.goto('/checkout')
   await expect(page.getByText('Cotação válida por')).toBeVisible()
   await expect(page).toHaveScreenshot('checkout.png', {

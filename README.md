@@ -69,7 +69,7 @@ Endpoints locais de controle: `POST /api/dev/scenario` com `{scenario}`, `POST /
 
 Veja [ARCHITECTURE.md](ARCHITECTURE.md), [guia para defesa técnica](docs/SOLUTION-GUIDE.md) e [plano de ação](docs/superpowers/plans/2026-10-31-nft-marketplace.md).
 
-A interface usa direção visual provisória e ilustrações SVG locais. A cópia Figma atual é `T3mb62CfaKKBEad1KGr5Qy`, página `0:1`; o acesso pelo MCP foi confirmado, com 15 frames principais identificados. Fidelidade ao Figma permanece pendente. As ilustrações não foram extraídas do Figma. Nenhum resultado de testes ou pontuação deve ser presumido: consulte as evidências registradas em `docs/execution/progress.md`.
+A interface usa a identidade Kurio: paleta café/cobre, Roboto Mono e assets originais extraídos pelo MCP do Figma `T3mb62CfaKKBEad1KGr5Qy`. Os 15 frames orientam as composições desktop/mobile. `DESIGN.md` registra os tokens e `ARCHITECTURE.md` as decisões técnicas. Os totais e dados privados vêm do MSW; valores estáticos dos frames não substituem a cotação. Capturas desktop do MCP são reduzidas, portanto não se afirma igualdade pixel a pixel em resolução nativa.
 
 ## Deploy
 
@@ -77,6 +77,8 @@ Build: `yarn build`; saída: `dist`; variável: `VITE_ENABLE_MOCKS=true`. `verce
 
 ## Verificação realizada
 
-Typecheck, lint e build aprovados. Instalação com lockfile congelado e build reproduzidos em pasta limpa. Playwright: **34 testes aprovados**, desktop/mobile, incluindo oito baselines visuais e verificações em 768 px. [Resultados Lighthouse](lighthouse/RESULTS.md): desktop 100 nas duas páginas; mobile 90 no início e 88 no detalhe. Accessibility, Best Practices e SEO: 100 em todas as combinações. O detalhe mobile permanece abaixo da meta de desempenho 90.
+Typecheck, lint, formato e build aprovados após a adaptação. Playwright: **36 testes aprovados** em uma execução completa, com 32 cenários funcionais, 2 de evidência e 2 visuais que comparam oito baselines. Verificação em 390/414/768/1440 px. O helper dos testes aguarda a inicialização do MSW antes de usar os endpoints de controle.
 
-O deploy público aguarda autorização da integração para a equipe Vercel. A interface continua provisória até concluir a adaptação ao Figma; nenhuma equivalência visual com o arquivo foi declarada.
+[Resultados Lighthouse históricos](lighthouse/RESULTS.md) pertencem à versão provisória e não medem a identidade Kurio: desktop 100 nas duas páginas; mobile 90 no início e 88 no detalhe. Accessibility, Best Practices e SEO 100 naquela versão.
+
+O deploy público aguarda autorização da integração para a equipe Vercel. A adaptação Kurio está aplicada, com 21 capturas de evidência em desktop/mobile/tablet e oito baselines versionados. A revisão resolveu sete correções materiais; o texto de boas-vindas presente no Figma foi preservado como exceção documentada à regra genérica do reviewer.

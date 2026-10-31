@@ -4,6 +4,8 @@ async function control(
   path: string,
   input: Record<string, unknown> = {},
 ) {
+  // Wait for bootstrap: MSW starts before React exposes the app shell.
+  await page.locator('#main').waitFor()
   return page.evaluate(
     async ({ path, input }) => {
       const modulePath = '/src/lib/api.ts'
@@ -18,7 +20,21 @@ async function login(page: Page, email = 'alex@example.com') {
   await page.getByLabel('E-mail', { exact: true }).fill(email)
   await page.getByLabel('Senha', { exact: true }).fill('Demo1234!')
   await page.getByRole('button', { name: 'Entrar', exact: true }).click()
-  await expect(page.getByTitle('Meu perfil')).toBeVisible()
+  await expect(
+    page.getByTitle('Meu perfil').filter({ visible: true }),
+  ).toBeVisible()
+}
+async function signOut(page: Page) {
+  const button = page
+    .getByRole('button', { name: 'Sair', exact: true })
+    .filter({ visible: true })
+    .first()
+  if (!(await button.count())) await page.goto('/profile')
+  await page
+    .getByRole('button', { name: 'Sair', exact: true })
+    .filter({ visible: true })
+    .first()
+    .click()
 }
 async function addToCart(page: Page) {
   await page.goto('/nfts/nft-1')
@@ -28,7 +44,7 @@ async function addToCart(page: Page) {
 async function checkout(page: Page) {
   await page.goto('/checkout')
   await expect(page.getByText('Cotação válida por')).toBeVisible()
-  await page.getByLabel('Selecione uma carteira').selectOption('wallet-user-1')
+  await page.getByRole('radio', { name: /Minha carteira/ }).check()
   await page.getByRole('checkbox').check()
   await expect(
     page.getByRole('button', { name: 'Confirmar compra' }),
@@ -36,9 +52,7 @@ async function checkout(page: Page) {
 }
 test.beforeEach(async ({ page }) => {
   await page.goto('/?reset=1')
-  await expect(
-    page.getByRole('heading', { name: /Arte que abre/ }),
-  ).toBeVisible()
+  await expect(page.getByRole('heading', { name: /SEJA DONO/ })).toBeVisible()
 })
 test('compra completa, recibo imutável e refresh', async ({ page }) => {
   await login(page)
@@ -51,10 +65,10 @@ test('compra completa, recibo imutável e refresh', async ({ page }) => {
     }),
   ).toBeVisible()
   const url = page.url()
-  await expect(page.getByText('0.123 ETH', { exact: true })).toBeVisible()
+  await expect(page.getByText('1.21975 ETH', { exact: true })).toBeVisible()
   await control(page, 'event', { id: 'nft-1' })
   await page.reload()
-  await expect(page.getByText('0.123 ETH', { exact: true })).toBeVisible()
+  await expect(page.getByText('1.21975 ETH', { exact: true })).toBeVisible()
   expect(page.url()).toBe(url)
   await page.goto('/cart')
   await expect(
@@ -66,28 +80,34 @@ test('filtros e paginação sobrevivem ao histórico e refresh', async ({
 }) => {
   await page.getByRole('button', { name: 'Próxima', exact: true }).click()
   await expect(page).toHaveURL(/page=2/)
-  await page.getByRole('button', { name: 'Arte', exact: true }).click()
+  const filterToggle = page.getByRole('button', { name: 'Mostrar filtros' })
+  if (await filterToggle.isVisible()) await filterToggle.click()
+  await page.getByRole('button', { name: /^Arte digital/ }).click()
   await expect(page).toHaveURL(/page=1/)
   await page.getByLabel('Ordenação').selectOption('price-desc')
-  await page.getByLabel('Buscar NFTs').fill('Orbital')
-  await expect(page.getByText('6 obras para descobrir')).toBeVisible()
+  await page.getByLabel('Buscar NFTs').filter({ visible: true }).fill('Emerald')
+  await expect(page.getByText('4 obras para descobrir')).toBeVisible()
   await page.reload()
-  await expect(page.getByLabel('Buscar NFTs')).toHaveValue('Orbital')
+  await expect(
+    page.getByLabel('Buscar NFTs').filter({ visible: true }),
+  ).toHaveValue('Emerald')
   await page.goBack()
-  await expect(page.getByLabel('Buscar NFTs')).not.toHaveValue('Orbital')
+  await expect(
+    page.getByLabel('Buscar NFTs').filter({ visible: true }),
+  ).not.toHaveValue('Emerald')
 })
 test('isolamento de favoritos e pedidos entre usuários', async ({ page }) => {
   await login(page)
   const favorite = page.getByRole('button', {
-    name: 'Adicionar aos favoritos: Orbital dream #001',
+    name: 'Adicionar aos favoritos: Emerald Ape #042',
   })
   await favorite.click()
   await expect(
     page.getByRole('button', {
-      name: 'Remover dos favoritos: Orbital dream #001',
+      name: 'Remover dos favoritos: Emerald Ape #042',
     }),
   ).toBeEnabled()
-  await page.getByRole('button', { name: 'Sair', exact: true }).click()
+  await signOut(page)
   await expect(
     page.getByRole('link', { name: 'Entrar', exact: true }),
   ).toBeVisible()
@@ -100,14 +120,14 @@ test('isolamento de favoritos e pedidos entre usuários', async ({ page }) => {
   await expect(
     page.getByRole('heading', { name: 'Você ainda não tem pedidos' }),
   ).toBeVisible()
-  await page.getByRole('button', { name: 'Sair', exact: true }).click()
+  await signOut(page)
   await expect(
     page.getByRole('link', { name: 'Entrar', exact: true }),
   ).toBeVisible()
   await login(page)
   await page.goto('/favorites')
   await expect(
-    page.getByRole('heading', { name: 'Orbital dream #001' }),
+    page.getByRole('heading', { name: 'Emerald Ape #042' }),
   ).toBeVisible()
 })
 test('pagamento recusado preserva o carrinho', async ({ page }) => {
@@ -121,7 +141,7 @@ test('pagamento recusado preserva o carrinho', async ({ page }) => {
   ).toBeVisible()
   await page.goto('/cart')
   await expect(
-    page.getByRole('heading', { name: 'Orbital dream #001' }),
+    page.getByRole('heading', { name: 'Emerald Ape #042' }),
   ).toBeVisible()
 })
 test('timeout recupera a mesma compra sem duplicação', async ({ page }) => {
@@ -157,7 +177,10 @@ test('Socket.IO altera preço e exige revisão de cotação', async ({ page }) =
     page.getByText('Preço ou disponibilidade atualizado. Revise sua cotação.'),
   ).toBeVisible()
   await expect(
-    page.getByText('0.99 ETH', { exact: false }).first(),
+    page
+      .getByText('0.99 ETH', { exact: false })
+      .filter({ visible: true })
+      .first(),
   ).toBeVisible()
   await expect(
     page.getByRole('button', { name: 'Confirmar compra' }),
@@ -179,7 +202,7 @@ test('favorito otimista volta ao estado anterior em falha', async ({
   await control(page, 'scenario', { scenario: 'favorite-error' })
   await page
     .getByRole('button', {
-      name: 'Adicionar aos favoritos: Orbital dream #001',
+      name: 'Adicionar aos favoritos: Emerald Ape #042',
     })
     .click()
   await expect(
@@ -187,7 +210,7 @@ test('favorito otimista volta ao estado anterior em falha', async ({
   ).toBeVisible()
   await expect(
     page.getByRole('button', {
-      name: 'Adicionar aos favoritos: Orbital dream #001',
+      name: 'Adicionar aos favoritos: Emerald Ape #042',
     }),
   ).toHaveAttribute('aria-pressed', 'false')
 })
@@ -198,11 +221,11 @@ test('carrinho visitante é mesclado e persiste após login', async ({
   await login(page)
   await page.goto('/cart')
   await expect(
-    page.getByRole('heading', { name: 'Orbital dream #001' }),
+    page.getByRole('heading', { name: 'Emerald Ape #042' }),
   ).toBeVisible()
   await page.reload()
   await expect(
-    page.getByRole('heading', { name: 'Orbital dream #001' }),
+    page.getByRole('heading', { name: 'Emerald Ape #042' }),
   ).toBeVisible()
 })
 test('detalhe inexistente e rota global desconhecida', async ({ page }) => {
@@ -222,6 +245,7 @@ test('guard preserva destino e cadastro trata e-mail repetido', async ({
   await page.getByLabel('Nome', { exact: true }).fill('Nova conta')
   await page.getByLabel('E-mail', { exact: true }).fill('alex@example.com')
   await page.getByLabel('Senha', { exact: true }).fill('Demo1234!')
+  await page.getByLabel('Confirmar senha', { exact: true }).fill('Demo1234!')
   await page.getByRole('button', { name: 'Criar conta' }).click()
   await expect(page.locator('#email-error')).toHaveText(
     'Este e-mail já está cadastrado.',
@@ -283,16 +307,14 @@ test('rejeição definitiva da recuperação libera nova revisão', async ({
   ).toBeVisible()
   await control(page, 'scenario', { scenario: 'success' })
   await page.goto('/cart')
-  await page.getByLabel('Quantidade de Orbital dream #001').selectOption('2')
-  await expect(
-    page.getByLabel('Quantidade de Orbital dream #001'),
-  ).toBeEnabled()
+  await page.getByLabel('Quantidade de Emerald Ape #042').selectOption('2')
+  await expect(page.getByLabel('Quantidade de Emerald Ape #042')).toBeEnabled()
   await page.goto('/checkout')
   await page.getByRole('button', { name: 'Recuperar tentativa' }).click()
   await expect(
     page.getByRole('button', { name: 'Recuperar tentativa' }),
   ).not.toBeVisible()
-  await page.getByLabel('Selecione uma carteira').selectOption('wallet-user-1')
+  await page.getByRole('radio', { name: /Minha carteira/ }).check()
   await page.getByRole('checkbox').check()
   await expect(
     page.getByRole('button', { name: 'Confirmar compra' }),
@@ -321,7 +343,7 @@ test('resposta tardia de perfil não altera identidade de outra conta', async ({
       }),
     )
     .toBe('Alex atualizado')
-  await page.getByRole('button', { name: 'Sair', exact: true }).click()
+  await signOut(page)
   await expect(
     page.getByRole('link', { name: 'Entrar', exact: true }),
   ).toBeVisible()
@@ -329,9 +351,11 @@ test('resposta tardia de perfil não altera identidade de outra conta', async ({
   await page.getByLabel('E-mail', { exact: true }).fill('sam@example.com')
   await page.getByLabel('Senha', { exact: true }).fill('Demo1234!')
   await page.getByRole('button', { name: 'Entrar', exact: true }).click()
-  await expect(page.getByTitle('Meu perfil')).toHaveText('S')
+  await expect(
+    page.getByTitle('Meu perfil').filter({ visible: true }),
+  ).toHaveText('S')
   await delayedResponse
-  await page.getByTitle('Meu perfil').click()
+  await page.getByTitle('Meu perfil').filter({ visible: true }).click()
   await expect(page.getByLabel('Nome', { exact: true })).toHaveValue(
     'Sam Rivera',
   )
@@ -377,7 +401,7 @@ test('detalhe lento reserva o espaço da imagem antes dos dados', async ({
   await expect(placeholder).toBeVisible()
   const reserved = await placeholder.boundingBox()
   await expect(
-    page.getByRole('heading', { name: 'Orbital dream #001' }),
+    page.getByRole('heading', { name: 'Emerald Ape #042' }),
   ).toBeVisible()
   const image = await page.locator('.detail-art').boundingBox()
   expect(reserved).not.toBeNull()
