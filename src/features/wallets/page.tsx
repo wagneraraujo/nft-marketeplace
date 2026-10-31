@@ -1,3 +1,4 @@
+import { AccountSidebar } from '@/components/layout/account-sidebar'
 import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
@@ -53,113 +54,160 @@ export function WalletsPage() {
     onError: (error) => toast.error(errorMessage(error)),
   })
   return (
-    <main className="page">
-      <div className="page-heading">
-        <h1>
-          Minhas carteiras<span>.</span>
-        </h1>
-        <p>Escolha como organizar seus pagamentos.</p>
-      </div>
-      <div className="two-columns">
-        <section>
-          {query.isPending ? (
-            <Loading />
-          ) : query.error ? (
-            <ErrorState
-              error={query.error}
-              retry={() => void query.refetch()}
-            />
-          ) : !query.data?.length ? (
-            <Empty>
-              <WalletCards size={32} />
-              <h2>Adicione sua primeira carteira</h2>
-            </Empty>
-          ) : (
-            query.data.map((wallet) => (
-              <article className="panel wallet" key={wallet.id}>
-                <WalletCards size={25} />
-                <h2>{wallet.label}</h2>
-                <p className="hash">{wallet.address}</p>
-                {wallet.primary ? (
-                  <span className="tag">Principal</span>
-                ) : (
-                  <Button
-                    variant="outline"
-                    disabled={primary.isPending}
-                    onClick={() => primary.mutate(wallet.id)}
-                  >
-                    Definir como principal
-                  </Button>
-                )}
-                <Button
-                  variant="ghost"
-                  disabled={mutation.isPending}
-                  onClick={() => {
-                    setEditingId(wallet.id)
-                    reset({
-                      label: wallet.label,
-                      address: wallet.address,
-                      primary: wallet.primary,
-                    })
-                  }}
-                >
-                  Editar carteira
-                </Button>
-              </article>
-            ))
-          )}
-        </section>
-        <form
-          className="panel"
-          noValidate
-          onSubmit={handleSubmit((input) => mutation.mutate(input))}
-        >
-          <h2>{editingId ? 'Editar carteira' : 'Adicionar carteira'}</h2>
-          {(['label', 'address'] as const).map((field) => (
-            <label className="field" key={field}>
-              {field === 'label' ? 'Nome da carteira' : 'Endereço Ethereum'}
-              <input
-                placeholder={field === 'address' ? '0x…' : 'Minha carteira'}
-                {...register(field)}
-                aria-invalid={!!errors[field]}
-                aria-describedby={`${field}-error`}
+    <main className="page account-layout">
+      <AccountSidebar />
+      <div className="account-main">
+        <div className="page-heading">
+          <h1>
+            Minhas carteiras<span>.</span>
+          </h1>
+          <p>Escolha como organizar seus pagamentos.</p>
+        </div>
+        <div className="two-columns wallets-content">
+          <section>
+            {query.isPending ? (
+              <Loading />
+            ) : query.error ? (
+              <ErrorState
+                error={query.error}
+                retry={() => void query.refetch()}
               />
-              <span id={`${field}-error`} className="field-error">
-                {errors[field]?.message}
-              </span>
+            ) : !query.data?.length ? (
+              <Empty>
+                <WalletCards size={32} />
+                <h2>Adicione sua primeira carteira</h2>
+              </Empty>
+            ) : (
+              query.data.map((wallet) => (
+                <article className="panel wallet" key={wallet.id}>
+                  <WalletCards size={25} />
+                  <h2>{wallet.label}</h2>
+                  <p className="hash">{wallet.address}</p>
+                  {wallet.primary ? (
+                    <span className="tag">Principal</span>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      disabled={primary.isPending}
+                      onClick={() => primary.mutate(wallet.id)}
+                    >
+                      Definir como principal
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    disabled={mutation.isPending}
+                    onClick={() => {
+                      setEditingId(wallet.id)
+                      reset({
+                        label: wallet.label,
+                        address: wallet.address,
+                        primary: wallet.primary,
+                      })
+                    }}
+                  >
+                    Editar carteira
+                  </Button>
+                </article>
+              ))
+            )}
+          </section>
+          <form
+            className="panel"
+            noValidate
+            onSubmit={handleSubmit((input) => mutation.mutate(input))}
+          >
+            <h2>{editingId ? 'Editar carteira' : 'Adicionar carteira'}</h2>
+            <div className="wallet-form-fields">
+              {(['label', 'address'] as const).map((field) => (
+                <label className="field" key={field}>
+                  {field === 'label' ? 'Nome da carteira' : 'Endereço Ethereum'}
+                  <input
+                    placeholder={field === 'address' ? '0x…' : 'Minha carteira'}
+                    {...register(field)}
+                    aria-invalid={!!errors[field]}
+                    aria-describedby={`${field}-error`}
+                  />
+                  <span id={`${field}-error`} className="field-error">
+                    {errors[field]?.message}
+                  </span>
+                </label>
+              ))}
+              {(
+                [
+                  'displayName',
+                  'profileName',
+                  'secondaryAddress',
+                  'referralCode',
+                  'email',
+                  'ens',
+                ] as const
+              ).map((field) => (
+                <label className="field" key={field}>
+                  {
+                    {
+                      displayName: 'Nome de exibição',
+                      profileName: 'Nome do perfil',
+                      secondaryAddress: 'ENS ou carteira secundária (opcional)',
+                      referralCode: 'Código de indicação',
+                      email: 'E-mail da carteira',
+                      ens: 'Nome ENS',
+                    }[field]
+                  }
+                  <input
+                    type={field === 'email' ? 'email' : 'text'}
+                    {...register(field)}
+                  />
+                  <span className="field-error">{errors[field]?.message}</span>
+                </label>
+              ))}
+              <label className="field">
+                Rede
+                <select {...register('network')}>
+                  <option value="Ethereum">Ethereum</option>
+                </select>
+              </label>
+              <label className="field">
+                Tipo de carteira
+                <select {...register('type')}>
+                  <option>MetaMask</option>
+                  <option>WalletConnect</option>
+                  <option>Coinbase Wallet</option>
+                </select>
+              </label>
+            </div>
+            <label className="checkbox-field">
+              <input type="checkbox" {...register('primary')} />
+              Usar como carteira principal
             </label>
-          ))}
-          <label className="checkbox-field">
-            <input type="checkbox" {...register('primary')} />
-            Usar como carteira principal
-          </label>
-          {errors.root && (
-            <p role="alert" className="field-error">
-              {errors.root.message}
-            </p>
-          )}
-          <Button type="submit" disabled={mutation.isPending}>
-            {mutation.isPending
-              ? 'Salvando…'
-              : editingId
-                ? 'Salvar carteira'
-                : 'Adicionar carteira'}
-          </Button>
-          {editingId && (
-            <Button
-              variant="ghost"
-              onClick={() => {
-                setEditingId(null)
-                reset({ label: '', address: '', primary: false })
-              }}
-            >
-              Cancelar edição
+            {errors.root && (
+              <p role="alert" className="field-error">
+                {errors.root.message}
+              </p>
+            )}
+            <Button type="submit" disabled={mutation.isPending}>
+              {mutation.isPending
+                ? 'Salvando…'
+                : editingId
+                  ? 'Salvar carteira'
+                  : 'Adicionar carteira'}
             </Button>
-          )}
-          <p className="muted">
-            Não solicitamos chave privada ou frase de recuperação.
-          </p>
-        </form>
+            {editingId && (
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setEditingId(null)
+                  reset({ label: '', address: '', primary: false })
+                }}
+              >
+                Cancelar edição
+              </Button>
+            )}
+            <p className="muted">
+              Não solicitamos chave privada ou frase de recuperação.
+            </p>
+          </form>
+        </div>
       </div>
     </main>
   )

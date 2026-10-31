@@ -1,10 +1,16 @@
+import { useState } from 'react'
+import { quoteOptions } from '@/features/checkout/api'
+import { storage } from '@/lib/storage'
+import { QuantityControl } from '@/components/design/quantity'
+import { catalogOptions } from '@/features/catalog/queries'
+import { NftCard } from '@/features/catalog/card'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { Trash2, ArrowRight, ShoppingBag } from 'lucide-react'
 import { toast } from 'sonner'
 import { useSession } from '@/features/auth/use-session'
 import { cartOptions, useCartMutation } from './queries'
-import { formatEth } from '@/lib/decimal'
+import { formatEth, multiply } from '@/lib/decimal'
 import { errorMessage } from '@/lib/api'
 import { Loading, ErrorState, Empty } from '@/components/feedback/states'
 import { Button } from '@/components/ui/button'
@@ -12,14 +18,34 @@ export function CartPage() {
   const { data: user } = useSession()
   const query = useQuery(cartOptions(user?.id))
   const mutation = useCartMutation(user?.id)
+  const [coupon, setCoupon] = useState(() =>
+    storage.read(`coupon:${user?.id}`, ''),
+  )
+  const [draft, setDraft] = useState(coupon)
+  const quote = useQuery(quoteOptions(user?.id, coupon))
+  const related = useQuery(
+    catalogOptions({
+      q: '',
+      category: '',
+      rarity: '',
+      sort: 'newest',
+      page: 1,
+    }),
+  )
   return (
-    <main className="page">
-      <div className="page-heading">
-        <span className="eyebrow">SUA COLEÇÃO COMEÇA AQUI</span>
-        <h1>
-          Meu carrinho<span>.</span>
-        </h1>
-        <p>Revise suas descobertas antes de continuar.</p>
+    <main className="page cart-page">
+      <div className="mobile-screen-header">
+        <Link to="/" aria-label="Voltar">
+          ‹
+        </Link>
+        <h1>Carrinho de NFTs</h1>
+      </div>
+      <div className="breadcrumbs">
+        <Link to="/">Início</Link>
+        <span>/</span>
+        <Link to="/">Mercado</Link>
+        <span>/</span>
+        <h1>Carrinho</h1>
       </div>
       {query.isPending ? (
         <Loading />
@@ -42,6 +68,13 @@ export function CartPage() {
                 {notice}
               </p>
             ))}
+            <div className="cart-table-head">
+              <span>NFTs</span>
+              <span>Preço</span>
+              <span>Edições</span>
+              <span>Total</span>
+              <span />
+            </div>
             {query.data.items.map((item) => (
               <article className="cart-item" key={item.nft.id}>
                 <Link to="/nfts/$id" params={{ id: item.nft.id }}>
@@ -59,41 +92,31 @@ export function CartPage() {
                       {item.nft.name}
                     </Link>
                   </h2>
-                  <strong>{formatEth(item.nft.price)}</strong>
+                  <span className="cart-token">ID do token: {item.nft.id}</span>
                   {item.quantity > item.nft.stock && (
                     <p className="field-error">
                       Disponibilidade alterada: {item.nft.stock} edições.
                     </p>
                   )}
                 </div>
-                <label className="quantity">
-                  <span>Quantidade</span>
-                  <select
-                    aria-label={`Quantidade de ${item.nft.name}`}
-                    value={item.quantity}
-                    disabled={mutation.isPending}
-                    onChange={(e) =>
-                      mutation.mutate(
-                        { id: item.nft.id, quantity: Number(e.target.value) },
-                        {
-                          onError: (error) => toast.error(errorMessage(error)),
-                        },
-                      )
-                    }
-                  >
-                    {Array.from(
-                      {
-                        length: Math.max(
-                          item.quantity,
-                          Math.min(10, item.nft.stock),
-                        ),
-                      },
-                      (_, i) => (
-                        <option key={i + 1}>{i + 1}</option>
-                      ),
-                    )}
-                  </select>
-                </label>
+                <strong className="cart-unit-price">
+                  {formatEth(item.nft.price)}
+                </strong>
+                <QuantityControl
+                  value={item.quantity}
+                  max={Math.min(10, item.nft.stock)}
+                  disabled={mutation.isPending}
+                  label={item.nft.name}
+                  onChange={(quantity) =>
+                    mutation.mutate(
+                      { id: item.nft.id, quantity },
+                      { onError: (error) => toast.error(errorMessage(error)) },
+                    )
+                  }
+                />
+                <strong className="cart-line-total">
+                  {formatEth(multiply(item.nft.price, item.quantity))}
+                </strong>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -112,16 +135,64 @@ export function CartPage() {
             ))}
           </section>
           <aside className="summary">
-            <span className="eyebrow">PRÓXIMO PASSO</span>
-            <h2>Quase na sua coleção.</h2>
-            <p>
-              O total, as taxas e os cupons serão calculados na revisão do
-              pagamento.
-            </p>
-            <p>
-              {query.data.items.reduce((sum, item) => sum + item.quantity, 0)}{' '}
-              edições selecionadas
-            </p>
+            <h2>Resumo da carteira</h2>
+            {user ? (
+              <>
+                <form
+                  className="coupon-form"
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    const value = draft.trim().toUpperCase()
+                    storage.write(`coupon:${user.id}`, value)
+                    setCoupon(value)
+                  }}
+                >
+                  <label className="field">
+                    Código promocional
+                    <input
+                      placeholder="Digite o código promocional…"
+                      value={draft}
+                      onChange={(e) => setDraft(e.target.value)}
+                    />
+                  </label>
+                  <Button type="submit" disabled={quote.isFetching}>
+                    Aplicar
+                  </Button>
+                </form>
+                {quote.isPending ? (
+                  <Loading />
+                ) : quote.error ? (
+                  <ErrorState
+                    error={quote.error}
+                    retry={() => void quote.refetch()}
+                  />
+                ) : (
+                  <dl aria-busy={quote.isFetching}>
+                    <div>
+                      <dt>Subtotal</dt>
+                      <dd>{formatEth(quote.data.subtotal)}</dd>
+                    </div>
+                    <div>
+                      <dt>Desconto</dt>
+                      <dd>− {formatEth(quote.data.discount)}</dd>
+                    </div>
+                    <div>
+                      <dt>Taxa de serviço</dt>
+                      <dd>{formatEth(quote.data.fee)}</dd>
+                    </div>
+                    <div className="total">
+                      <dt>Total</dt>
+                      <dd>{formatEth(quote.data.total)}</dd>
+                    </div>
+                  </dl>
+                )}
+              </>
+            ) : (
+              <p>
+                Entre na sua conta para calcular taxas, aplicar cupons e revisar
+                o total.
+              </p>
+            )}
             <Link className="button primary wide" to="/checkout">
               Revisar pagamento <ArrowRight size={17} />
             </Link>
@@ -131,6 +202,14 @@ export function CartPage() {
           </aside>
         </div>
       )}
+      <section className="related">
+        <h2>Colecionadores também viram</h2>
+        <div className="nft-grid">
+          {related.data?.items.slice(3, 8).map((nft) => (
+            <NftCard nft={nft} key={nft.id} />
+          ))}
+        </div>
+      </section>
     </main>
   )
 }

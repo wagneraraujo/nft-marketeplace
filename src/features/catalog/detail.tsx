@@ -1,8 +1,11 @@
+import { catalogOptions } from './queries'
+import { NftCard } from './card'
+import { QuantityControl } from '@/components/design/quantity'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { toast } from 'sonner'
-import { ShieldCheck, ArrowUpRight } from 'lucide-react'
+import { ShieldCheck, ArrowUpRight, ChevronLeft, Heart } from 'lucide-react'
 import { nftOptions } from './queries'
 import { useCartMutation } from '@/features/cart/queries'
 import { useSession } from '@/features/auth/use-session'
@@ -15,6 +18,16 @@ export function NftDetail({ id }: { id: string }) {
   const { data: user } = useSession()
   const mutation = useCartMutation(user?.id)
   const [quantity, setQuantity] = useState(1)
+  const [activeImage, setActiveImage] = useState(0)
+  const related = useQuery(
+    catalogOptions({
+      q: '',
+      category: '',
+      rarity: '',
+      sort: 'newest',
+      page: 1,
+    }),
+  )
   if (query.isPending)
     return (
       <main className="page" role="status" aria-label="Carregando obra">
@@ -22,7 +35,10 @@ export function NftDetail({ id }: { id: string }) {
           Carregando obra…
         </div>
         <div className="detail-grid" aria-hidden="true">
-          <div className="detail-loading-art" />
+          <div className="detail-gallery">
+            <div className="detail-thumbnails" />
+            <div className="detail-loading-art" />
+          </div>
           <div className="detail-loading-copy">
             <div className="skeleton">
               <div />
@@ -49,16 +65,37 @@ export function NftDetail({ id }: { id: string }) {
         <span>{nft.collection}</span>
       </div>
       <div className="detail-grid">
-        <img
-          className="detail-art"
-          src={nft.image}
-          alt={nft.name}
-          width={720}
-          height={720}
-          fetchPriority="high"
-        />
+        <div className="detail-mobile-back">
+          <Link to="/" aria-label="Voltar ao catálogo">
+            <ChevronLeft size={20} />
+          </Link>
+          <Link to="/favorites" aria-label="Favoritos">
+            <Heart size={19} />
+          </Link>
+        </div>
+        <div className="detail-gallery">
+          <div className="detail-thumbnails">
+            {[0, 1, 2, 3].map((index) => (
+              <button
+                key={index}
+                aria-label={`Visualizar miniatura ${index + 1} de ${nft.name}`}
+                aria-pressed={activeImage === index}
+                onClick={() => setActiveImage(index)}
+              >
+                <img src={nft.image} alt="" width={100} height={100} />
+              </button>
+            ))}
+          </div>
+          <img
+            className="detail-art"
+            src={nft.image}
+            alt={nft.name}
+            width={444}
+            height={444}
+            fetchPriority="high"
+          />
+        </div>
         <section className="detail-copy">
-          <span className="eyebrow">{nft.collection} ↗</span>
           <h1>{nft.name}</h1>
           <p className="muted">
             Criado por <strong>{nft.creator}</strong>
@@ -74,12 +111,11 @@ export function NftDetail({ id }: { id: string }) {
             <h2>{formatEth(nft.price)}</h2>
             <label className="field">
               Quantidade
-              <input
-                type="number"
-                min="1"
-                max={Math.min(10, nft.stock)}
+              <QuantityControl
                 value={quantity}
-                onChange={(e) => setQuantity(Number(e.target.value))}
+                max={Math.min(10, nft.stock)}
+                onChange={setQuantity}
+                label={nft.name}
               />
             </label>
             <Button
@@ -124,6 +160,30 @@ export function NftDetail({ id }: { id: string }) {
           )}
         </section>
       </div>
+      <section className="detail-description">
+        <h2>Descrição do NFT</h2>
+        <p>{nft.description}</p>
+        <p>
+          A coleção {nft.collection} reúne personagens com identidade própria e
+          atributos selecionados por {nft.creator}. Consulte a disponibilidade e
+          revise a cotação antes de concluir sua compra.
+        </p>
+        <p>
+          ID do token: {nft.id} · Categoria: {nft.category} · Raridade:{' '}
+          {nft.rarity}
+        </p>
+      </section>
+      <section className="related">
+        <h2>Você também pode gostar</h2>
+        <div className="nft-grid">
+          {related.data?.items
+            .filter((item) => item.id !== id)
+            .slice(0, 5)
+            .map((item) => (
+              <NftCard nft={item} key={item.id} />
+            ))}
+        </div>
+      </section>
     </main>
   )
 }

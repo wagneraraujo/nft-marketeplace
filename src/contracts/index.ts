@@ -6,6 +6,9 @@ export const accountSchema = z.object({
 })
 export const loginSchema = accountSchema.omit({ name: true })
 export const profileSchema = z.object({
+  username: z.string().max(40).optional(),
+  ens: z.string().max(100).optional(),
+  walletAlias: z.string().max(80).optional(),
   name: z.string().min(2),
   email: z.email(),
   avatar: z
@@ -16,6 +19,14 @@ export const profileSchema = z.object({
     ),
 })
 export const walletSchema = z.object({
+  displayName: z.string().max(80).optional(),
+  profileName: z.string().max(80).optional(),
+  network: z.literal('Ethereum').optional(),
+  type: z.enum(['MetaMask', 'WalletConnect', 'Coinbase Wallet']).optional(),
+  email: z.union([z.email(), z.literal('')]).optional(),
+  ens: z.string().max(100).optional(),
+  secondaryAddress: z.string().max(100).optional(),
+  referralCode: z.string().max(40).optional(),
   label: z.string().min(2, 'Informe um nome.'),
   address: z
     .string()
@@ -39,6 +50,9 @@ export const searchSchema = z.object({
 })
 export type CatalogSearch = z.infer<typeof searchSchema>
 export interface User {
+  username?: string
+  ens?: string
+  walletAlias?: string
   id: string
   name: string
   email: string
@@ -88,6 +102,14 @@ export interface Quote {
   coupon: string
 }
 export interface Wallet {
+  displayName?: string
+  profileName?: string
+  network?: 'Ethereum'
+  type?: 'MetaMask' | 'WalletConnect' | 'Coinbase Wallet'
+  email?: string
+  ens?: string
+  secondaryAddress?: string
+  referralCode?: string
   id: string
   label: string
   address: string

@@ -1,5 +1,5 @@
 import { Link, useNavigate } from '@tanstack/react-router'
-import { Heart, ArrowUpRight } from 'lucide-react'
+import { Heart } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { Nft } from '@/contracts'
@@ -57,29 +57,12 @@ export function NftCard({ nft }: { nft: Nft }) {
         </button>
       </div>
       <div className="nft-info">
-        <p className="collection">
-          {nft.collection} <span>↗</span>
-        </p>
         <h3>
           <Link to="/nfts/$id" params={{ id: nft.id }}>
             {nft.name}
           </Link>
         </h3>
-        <p className="creator">por {nft.creator}</p>
-        <div className="nft-bottom">
-          <div>
-            <small>Preço por edição</small>
-            <strong>{formatEth(nft.price)}</strong>
-          </div>
-          <Link
-            className="round-link"
-            to="/nfts/$id"
-            params={{ id: nft.id }}
-            aria-label={`Detalhes de ${nft.name}`}
-          >
-            <ArrowUpRight size={21} />
-          </Link>
-        </div>
+        <p className="card-price">{formatEth(nft.price)}</p>
       </div>
     </article>
   )

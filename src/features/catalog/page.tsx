@@ -1,10 +1,7 @@
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import {
-  ArrowDown,
-  ArrowUpRight,
-  Search,
-  SlidersHorizontal,
-} from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import { ArrowRight, Search, SlidersHorizontal } from 'lucide-react'
 import type { CatalogSearch } from '@/contracts'
 import { catalogOptions } from './queries'
 import { NftCard } from './card'
@@ -18,191 +15,310 @@ export function CatalogPage({
   onSearch: (value: CatalogSearch) => void
 }) {
   const result = useQuery(catalogOptions(search))
+  const [filters, setFilters] = useState(false)
   return (
-    <main className="page">
+    <main className="page catalog-page">
+      <div className="mobile-search">
+        <label className="search-field">
+          <Search size={21} />
+          <input
+            aria-label="Buscar NFTs"
+            placeholder="Explorar coleções"
+            value={search.q}
+            onChange={(e) =>
+              onSearch({ ...search, q: e.target.value, page: 1 })
+            }
+          />
+        </label>
+        <button
+          className="filter-toggle"
+          aria-label="Mostrar filtros"
+          aria-expanded={filters}
+          onClick={() => setFilters(!filters)}
+        >
+          <SlidersHorizontal />
+        </button>
+      </div>
       <section className="hero-market">
         <div className="hero-copy">
-          <span className="eyebrow">
-            <span className="dot" /> CRIATIVIDADE SEM LIMITES
-          </span>
+          <span className="hero-welcome">Bem-vindo à Kurio</span>
           <h1>
-            Arte que abre
-            <br />
-            novos <em>mundos.</em>
+            <span className="desktop-hero-title">
+              SEJA DONO DO FUTURO
+              <br />
+              DA ARTE DIGITAL
+            </span>
+            <span className="mobile-hero-title">
+              SEJA DONO DA
+              <br />
+              CULTURA DIGITAL
+            </span>
           </h1>
           <p>
-            Descubra obras únicas, encontre seu próximo artista favorito e
-            comece sua coleção digital.
+            Descubra NFTs selecionados de criadores emergentes e consagrados.
+            Colecione arte digital rara, apoie artistas e torne-se parte da
+            cultura do amanhã.
+          </p>
+          <p className="mobile-hero-description">
+            Descubra NFTs selecionados de criadores do mundo todo.
           </p>
           <a className="button primary" href="#catalog">
-            Explorar NFTs <ArrowUpRight size={18} />
+            EXPLORAR <ArrowRight size={17} />
           </a>
-          <div className="hero-note">
-            <span className="mini-orbs">
-              <i />
-              <i />
-              <i />
-            </span>
-            <span>
-              Um espaço para artistas
-              <br />
-              <strong>e novos colecionadores.</strong>
-            </span>
-          </div>
         </div>
-        <div className="hero-art">
-          <img
-            src="/art/art-1.svg"
-            alt="Composição abstrata orbital da coleção Otherworld"
-            width="720"
-            height="720"
-            fetchPriority="high"
-          />
-          <div className="featured-caption">
-            <div>
-              <span>COLEÇÃO EM DESTAQUE</span>
-              <strong>Otherworld</strong>
-            </div>
-            <ArrowUpRight size={27} />
-          </div>
-          <div className="art-stamp">
-            ARTE
-            <br />
-            ALÉM DO
-            <br />
-            ÓBVIO ↗
-          </div>
-        </div>
+        <img
+          className="hero-ape"
+          src="/figma/8f387.png"
+          alt="Emerald Ape, destaque da coleção Kurio"
+          width={450}
+          height={450}
+          fetchPriority="high"
+        />
+        <img
+          className="hero-mini-ape"
+          src="/figma/83794.png"
+          alt=""
+          width={58}
+          height={58}
+        />
+        <span className="hero-dots" aria-hidden="true">
+          •••
+        </span>
       </section>
       <section id="catalog" className="catalog-section">
-        <div className="section-heading">
-          <div>
-            <span className="eyebrow">ENCONTRE SUA PRÓXIMA DESCOBERTA</span>
-            <h2>
-              Explore o extraordinário<span>.</span>
-            </h2>
-          </div>
-          <ArrowDown size={27} />
-        </div>
-        <div className="filter-bar">
-          <div className="category-tabs" aria-label="Categorias">
-            {['', 'Arte', 'Fotografia', 'Colecionáveis'].map((category) => (
+        <aside className={`catalog-sidebar ${filters ? 'is-open' : ''}`}>
+          <div className="filter-group">
+            <h2>Coleções</h2>
+            {[
+              ['', 'Todas as coleções'],
+              ['Arte', 'Arte digital'],
+              ['Fotografia', 'Fotografia'],
+              ['Colecionáveis', 'Colecionáveis'],
+            ].map(([value, label]) => (
               <button
-                key={category}
-                aria-pressed={search.category === category}
-                onClick={() => onSearch({ ...search, category, page: 1 })}
+                key={value}
+                aria-pressed={search.category === value}
+                onClick={() =>
+                  onSearch({ ...search, category: value, page: 1 })
+                }
               >
-                {category || 'Todos os NFTs'}
+                {label}
+                <span>{value ? '12' : '36'}</span>
               </button>
             ))}
           </div>
-          <span className="filter-label">
-            <SlidersHorizontal size={17} /> Filtros
-          </span>
-        </div>
-        <div className="search-row">
-          <label className="search-input">
-            <Search size={18} />
-            <span className="sr-only">Buscar NFTs</span>
+          <div className="filter-group">
+            <h2>Raridade</h2>
+            {['', 'Comum', 'Raro', 'Épico'].map((value) => (
+              <button
+                key={value}
+                aria-pressed={search.rarity === value}
+                onClick={() => onSearch({ ...search, rarity: value, page: 1 })}
+              >
+                {value || 'Todas as raridades'}
+              </button>
+            ))}
+          </div>
+          <label className="search-field desktop-search">
+            <Search size={16} />
             <input
-              placeholder="Busque por obra, coleção ou artista"
+              aria-label="Buscar NFTs"
               value={search.q}
+              placeholder="Buscar coleção"
               onChange={(e) =>
                 onSearch({ ...search, q: e.target.value, page: 1 })
               }
             />
           </label>
-          <label>
-            <span className="sr-only">Raridade</span>
-            <select
-              value={search.rarity}
-              onChange={(e) =>
-                onSearch({ ...search, rarity: e.target.value, page: 1 })
-              }
-            >
-              <option value="">Todas as raridades</option>
-              <option>Comum</option>
-              <option>Raro</option>
-              <option>Épico</option>
-            </select>
-          </label>
-          <label>
-            <span className="sr-only">Ordenação</span>
-            <select
-              value={search.sort}
-              onChange={(e) =>
-                onSearch({
-                  ...search,
-                  sort: e.target.value as CatalogSearch['sort'],
-                  page: 1,
-                })
-              }
-            >
-              <option value="newest">Mais recentes</option>
-              <option value="price-asc">Menor preço</option>
-              <option value="price-desc">Maior preço</option>
-            </select>
-          </label>
-        </div>
-        <div className="results-line" aria-live="polite">
-          <span>{result.data?.total ?? '…'} obras para descobrir</span>
-          {result.isFetching && !result.isPending && <span>Atualizando…</span>}
-        </div>
-        {result.isPending ? (
-          <Loading cards />
-        ) : result.error ? (
-          <ErrorState
-            error={result.error}
-            retry={() => void result.refetch()}
-          />
-        ) : result.data.items.length ? (
-          <div className="nft-grid">
-            {result.data.items.map((nft) => (
-              <NftCard key={nft.id} nft={nft} />
-            ))}
+          <div className="featured-nft">
+            <h3>NFT EM DESTAQUE</h3>
+            <strong>OFERTA LIMITADA</strong>
+            <Link to="/nfts/$id" params={{ id: 'nft-2' }}>
+              <img
+                src="/figma/83794.png"
+                alt="Sage Nomad #009"
+                width={310}
+                height={310}
+              />
+            </Link>
           </div>
-        ) : (
-          <Empty>
-            <h3>Nenhuma obra encontrada</h3>
-            <p>Experimente outra busca ou remova os filtros.</p>
-            <Button
-              onClick={() =>
-                onSearch({
-                  q: '',
-                  category: '',
-                  rarity: '',
-                  sort: 'newest',
-                  page: 1,
-                })
-              }
-            >
-              Limpar filtros
-            </Button>
-          </Empty>
-        )}
-        {result.data && result.data.pages > 1 && (
-          <nav className="pagination" aria-label="Paginação">
-            <Button
-              variant="outline"
-              disabled={search.page <= 1 || result.isPlaceholderData}
-              onClick={() => onSearch({ ...search, page: search.page - 1 })}
-            >
-              Anterior
-            </Button>
-            <span>
-              Página {search.page} de {result.data.pages}
-            </span>
-            <Button
-              variant="outline"
-              disabled={
-                search.page >= result.data.pages || result.isPlaceholderData
-              }
-              onClick={() => onSearch({ ...search, page: search.page + 1 })}
-            >
-              Próxima
-            </Button>
-          </nav>
-        )}
+        </aside>
+        <div className="catalog-results">
+          <div className="catalog-toolbar">
+            <div className="category-tabs">
+              <button
+                aria-pressed={search.sort === 'newest'}
+                onClick={() => onSearch({ ...search, sort: 'newest', page: 1 })}
+              >
+                Todos os NFTs
+              </button>
+              <button
+                aria-pressed={search.sort === 'price-desc'}
+                onClick={() =>
+                  onSearch({ ...search, sort: 'price-desc', page: 1 })
+                }
+              >
+                Em alta
+              </button>
+            </div>
+            <label className="catalog-sort">
+              <span className="sr-only">Ordenação</span>
+              <select
+                value={search.sort}
+                onChange={(e) =>
+                  onSearch({
+                    ...search,
+                    sort: e.target.value as CatalogSearch['sort'],
+                    page: 1,
+                  })
+                }
+              >
+                <option value="newest">
+                  Ordenar por: Lançados recentemente
+                </option>
+                <option value="price-asc">Menor preço</option>
+                <option value="price-desc">Maior preço</option>
+              </select>
+            </label>
+          </div>
+          <div className="results-line sr-only" aria-live="polite">
+            {result.data?.total ?? '…'} obras para descobrir
+          </div>
+          {result.isPending ? (
+            <Loading cards />
+          ) : result.error ? (
+            <ErrorState
+              error={result.error}
+              retry={() => void result.refetch()}
+            />
+          ) : result.data.items.length ? (
+            <div className="nft-grid">
+              {result.data.items.map((nft) => (
+                <NftCard key={nft.id} nft={nft} />
+              ))}
+            </div>
+          ) : (
+            <Empty>
+              <h3>Nenhuma obra encontrada</h3>
+              <p>Experimente outra busca ou remova os filtros.</p>
+              <Button
+                onClick={() =>
+                  onSearch({
+                    q: '',
+                    category: '',
+                    rarity: '',
+                    sort: 'newest',
+                    page: 1,
+                  })
+                }
+              >
+                Limpar filtros
+              </Button>
+            </Empty>
+          )}
+          {result.data && result.data.pages > 1 && (
+            <nav className="pagination" aria-label="Paginação">
+              <button
+                aria-label="Anterior"
+                disabled={search.page <= 1 || result.isPlaceholderData}
+                onClick={() => onSearch({ ...search, page: search.page - 1 })}
+              >
+                ‹
+              </button>
+              {Array.from({ length: result.data.pages }, (_, i) => (
+                <button
+                  key={i}
+                  aria-label={`Página ${i + 1}`}
+                  aria-current={search.page === i + 1 ? 'page' : undefined}
+                  disabled={result.isPlaceholderData}
+                  onClick={() => onSearch({ ...search, page: i + 1 })}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button
+                aria-label="Próxima"
+                disabled={
+                  search.page >= result.data.pages || result.isPlaceholderData
+                }
+                onClick={() => onSearch({ ...search, page: search.page + 1 })}
+              >
+                ›
+              </button>
+            </nav>
+          )}
+        </div>
+      </section>
+      <section className="promotions">
+        <div>
+          <img src="/figma/8f387.png" alt="" width={285} height={250} />
+          <div>
+            <h2>
+              Lançamentos gênesis
+              <br />
+              de edição limitada
+            </h2>
+            <p>
+              Colecione criações únicas
+              <br />
+              de artistas em ascensão.
+            </p>
+            <a className="button primary" href="#catalog">
+              Explorar →
+            </a>
+          </div>
+        </div>
+        <div>
+          <img src="/figma/9add2.png" alt="" width={285} height={250} />
+          <div>
+            <h2>
+              Arte digital selecionada
+              <br />e muito mais
+            </h2>
+            <p>
+              Explore novos artistas,
+              <br />
+              coleções verificadas e uma
+              <br />
+              cultura que se transforma.
+            </p>
+            <a className="button primary" href="#catalog">
+              Explorar →
+            </a>
+          </div>
+        </div>
+      </section>
+      <section className="editorial">
+        <h2>Diário da Cunhagem</h2>
+        <p>
+          Histórias, guias e inspiração para colecionadores novos e veteranos da
+          propriedade digital.
+        </p>
+        <div className="editorial-grid">
+          {[
+            ['9add2.png', 'Como funciona a propriedade de NFTs'],
+            ['8f387.png', '10 artistas digitais para acompanhar'],
+            ['83794.png', 'Raridade, atributos e procedência'],
+            ['b7cfc.png', 'Como proteger sua carteira'],
+          ].map(([image, title], i) => (
+            <article key={title}>
+              <img
+                src={`/figma/${image}`}
+                alt=""
+                width={268}
+                height={200}
+                loading="lazy"
+              />
+              <div>
+                <h3>{title}</h3>
+                <p>Descubra a coleção Kurio e encontre sua próxima obra.</p>
+                <Link to="/nfts/$id" params={{ id: `nft-${i + 1}` }}>
+                  Ver coleção →
+                </Link>
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
     </main>
   )

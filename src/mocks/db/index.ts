@@ -20,6 +20,7 @@ interface RawCart {
 }
 interface Database {
   outcomes?: Record<string, 'confirmed' | 'declined'>
+  presentationVersion?: number
   schema: number
   users: Account[]
   nfts: Nft[]
@@ -65,6 +66,7 @@ export async function reset() {
   )
   db = {
     schema: 1,
+    presentationVersion: 2,
     users,
     nfts: structuredClone(seedNfts),
     carts: {},
@@ -84,6 +86,23 @@ export async function initialize() {
       const parsed = JSON.parse(value) as Database
       if (parsed.schema === 1) {
         db = parsed
+        if (db.presentationVersion !== 2) {
+          db.nfts = db.nfts.map((nft) => {
+            const current = seedNfts.find((item) => item.id === nft.id)
+            return current
+              ? {
+                  ...nft,
+                  name: current.name,
+                  image: current.image,
+                  collection: current.collection,
+                  creator: current.creator,
+                  description: current.description,
+                }
+              : nft
+          })
+          db.presentationVersion = 2
+          save()
+        }
         return
       }
     }
@@ -93,8 +112,8 @@ export async function initialize() {
   await reset()
 }
 export function publicUser(account: Account): User {
-  const { id, name, email, avatar } = account
-  return { id, name, email, avatar }
+  const { id, name, email, avatar, username, ens, walletAlias } = account
+  return { id, name, email, avatar, username, ens, walletAlias }
 }
 export function rawCart(owner: string) {
   return (db.carts[owner] ??= { items: {}, version: 1, notices: [] })

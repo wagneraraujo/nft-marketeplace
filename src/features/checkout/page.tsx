@@ -105,18 +105,17 @@ export function CheckoutPage() {
     quote.data.cartVersion !== cart.data?.version ||
     quote.isFetching
   return (
-    <main className="page">
+    <main className="page checkout-page">
+      <div className="mobile-screen-header">
+        <Link to="/cart" aria-label="Voltar">
+          ‹
+        </Link>
+        <h1>Pagamento com carteira</h1>
+      </div>
       <div className="breadcrumbs">
         <Link to="/cart">Carrinho</Link>
         <span>/</span>
         <span>Pagamento</span>
-      </div>
-      <div className="page-heading">
-        <span className="eyebrow">ÚLTIMO PASSO</span>
-        <h1>
-          Uma nova obra. Sua<span>.</span>
-        </h1>
-        <p>Revise os valores e escolha sua carteira.</p>
       </div>
       {recovering && (
         <div className="notice" role="status">
@@ -132,9 +131,47 @@ export function CheckoutPage() {
         </div>
       )}
       <div className="cart-layout">
-        <section>
-          <div className="panel">
-            <h2>Suas obras</h2>
+        <section className="checkout-profile">
+          {' '}
+          <h1>Perfil do colecionador</h1>
+          <div className="profile-form-fields">
+            <label className="field">
+              Nome de exibição
+              <input readOnly value={user?.name ?? ''} />
+            </label>
+            <label className="field">
+              E-mail
+              <input readOnly value={user?.email ?? ''} />
+            </label>
+            <label className="field">
+              Rede
+              <input readOnly value="Ethereum (simulada)" />
+            </label>
+            <label className="field">
+              Carteira principal
+              <input
+                readOnly
+                value={
+                  wallets.data?.find((wallet) => wallet.primary)?.address ??
+                  'Nenhuma carteira cadastrada'
+                }
+              />
+            </label>
+          </div>
+          <p>
+            <Link className="text-link" to="/profile">
+              Editar perfil
+            </Link>{' '}
+            ·{' '}
+            <Link className="text-link" to="/wallets">
+              Gerenciar carteiras
+            </Link>
+          </p>
+        </section>
+        <div className="checkout-sidebar">
+          <section className="checkout-nfts">
+            {' '}
+            <h2>Seus NFTs</h2>
             {cart.isPending ? (
               <Loading />
             ) : (
@@ -155,12 +192,9 @@ export function CheckoutPage() {
                 </div>
               ))
             )}
-          </div>
-          <form
-            className="panel"
-            noValidate
-            onSubmit={handleSubmit((input) => mutation.mutate(input))}
-          >
+          </section>{' '}
+          <section className="checkout-wallets">
+            {' '}
             <h2>Carteira de pagamento</h2>
             {wallets.isPending ? (
               <Loading />
@@ -177,26 +211,118 @@ export function CheckoutPage() {
                 </Link>
               </p>
             ) : (
-              <label className="field">
-                Selecione uma carteira
-                <select
-                  {...register('walletId')}
-                  aria-invalid={!!errors.walletId}
-                  aria-describedby="wallet-error"
-                >
-                  <option value="">Selecione</option>
-                  {wallets.data.map((wallet) => (
-                    <option key={wallet.id} value={wallet.id}>
-                      {wallet.label} · {wallet.address.slice(0, 8)}…
-                      {wallet.primary ? ' (principal)' : ''}
-                    </option>
-                  ))}
-                </select>
+              <fieldset className="wallet-options">
+                <legend>Carteira conectada</legend>
+                {wallets.data.map((wallet) => (
+                  <label className="wallet-option" key={wallet.id}>
+                    <input
+                      type="radio"
+                      value={wallet.id}
+                      form="checkout-payment"
+                      {...register('walletId')}
+                    />
+                    <span>
+                      <strong>{wallet.label}</strong>
+                      <small>
+                        {wallet.address.slice(0, 8)}…{wallet.address.slice(-4)}
+                      </small>
+                      <small>Rede Ethereum · {wallet.type ?? 'MetaMask'}</small>
+                    </span>
+                  </label>
+                ))}
                 <span id="wallet-error" className="field-error">
                   {errors.walletId?.message}
                 </span>
-              </label>
+                <Link className="text-link" to="/wallets">
+                  Trocar carteira
+                </Link>
+              </fieldset>
             )}
+          </section>{' '}
+          <aside className="summary">
+            <h2>Resumo do pedido</h2>
+            <form
+              className="coupon-form"
+              onSubmit={(e) => {
+                e.preventDefault()
+                const value = draft.trim().toUpperCase()
+                storage.write(`coupon:${user?.id}`, value)
+                setCoupon(value)
+                setReviewed(null)
+                setValue('accepted', false)
+              }}
+            >
+              <label className="field">
+                Cupom
+                <input
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  placeholder="Código do cupom"
+                />
+              </label>
+              <Button
+                type="submit"
+                variant="outline"
+                disabled={quote.isFetching}
+              >
+                Aplicar
+              </Button>
+            </form>
+            {quote.isPending ? (
+              <Loading />
+            ) : quote.error ? (
+              <ErrorState
+                error={quote.error}
+                retry={() => void quote.refetch()}
+              />
+            ) : (
+              <>
+                <dl>
+                  <div>
+                    <dt>Subtotal</dt>
+                    <dd>{formatEth(quote.data.subtotal)}</dd>
+                  </div>
+                  <div>
+                    <dt>Desconto</dt>
+                    <dd>− {formatEth(quote.data.discount)}</dd>
+                  </div>
+                  <div>
+                    <dt>Taxa de serviço</dt>
+                    <dd>{formatEth(quote.data.fee)}</dd>
+                  </div>
+                  <div className="total">
+                    <dt>Total</dt>
+                    <dd>{formatEth(quote.data.total)}</dd>
+                  </div>
+                </dl>
+                <p className="muted">
+                  {stale
+                    ? 'A cotação precisa ser atualizada.'
+                    : `Cotação válida por ${Math.max(0, Math.ceil((quote.data.expiresAt - now) / 1000))} segundos.`}
+                </p>
+                <Button
+                  variant="outline"
+                  className="wide"
+                  disabled={
+                    quote.isFetching || mutation.isPending || recovering
+                  }
+                  onClick={() => {
+                    setReviewed(null)
+                    setValue('accepted', false)
+                    void quote.refetch()
+                  }}
+                >
+                  Atualizar cotação
+                </Button>
+              </>
+            )}
+          </aside>{' '}
+          <form
+            className="panel checkout-confirm"
+            id="checkout-payment"
+            noValidate
+            onSubmit={handleSubmit((input) => mutation.mutate(input))}
+          >
             <label className="checkbox-field">
               <input
                 type="checkbox"
@@ -234,79 +360,7 @@ export function CheckoutPage() {
               transferido.
             </p>
           </form>
-        </section>
-        <aside className="summary">
-          <h2>Resumo do pedido</h2>
-          <form
-            className="coupon-form"
-            onSubmit={(e) => {
-              e.preventDefault()
-              const value = draft.trim().toUpperCase()
-              storage.write(`coupon:${user?.id}`, value)
-              setCoupon(value)
-              setReviewed(null)
-              setValue('accepted', false)
-            }}
-          >
-            <label className="field">
-              Cupom
-              <input
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                placeholder="Código do cupom"
-              />
-            </label>
-            <Button type="submit" variant="outline" disabled={quote.isFetching}>
-              Aplicar
-            </Button>
-          </form>
-          {quote.isPending ? (
-            <Loading />
-          ) : quote.error ? (
-            <ErrorState
-              error={quote.error}
-              retry={() => void quote.refetch()}
-            />
-          ) : (
-            <>
-              <dl>
-                <div>
-                  <dt>Subtotal</dt>
-                  <dd>{formatEth(quote.data.subtotal)}</dd>
-                </div>
-                <div>
-                  <dt>Desconto</dt>
-                  <dd>− {formatEth(quote.data.discount)}</dd>
-                </div>
-                <div>
-                  <dt>Taxa de serviço</dt>
-                  <dd>{formatEth(quote.data.fee)}</dd>
-                </div>
-                <div className="total">
-                  <dt>Total</dt>
-                  <dd>{formatEth(quote.data.total)}</dd>
-                </div>
-              </dl>
-              <p className="muted">
-                {stale
-                  ? 'A cotação precisa ser atualizada.'
-                  : `Cotação válida por ${Math.max(0, Math.ceil((quote.data.expiresAt - now) / 1000))} segundos.`}
-              </p>
-              <Button
-                variant="outline"
-                className="wide"
-                disabled={quote.isFetching || mutation.isPending || recovering}
-                onClick={() => {
-                  setReviewed(null)
-                  setValue('accepted', false)
-                  void quote.refetch()
-                }}
-              >
-                Atualizar cotação
-              </Button>
-            </>
-          )}
-        </aside>
+        </div>
       </div>
     </main>
   )
