@@ -9,7 +9,7 @@ import { useSession } from '@/features/auth/use-session'
 import { formatEth } from '@/lib/decimal'
 import { errorMessage } from '@/lib/api'
 import { Button } from '@/components/ui/button'
-import { Loading, ErrorState } from '@/components/feedback/states'
+import { ErrorState } from '@/components/feedback/states'
 export function NftDetail({ id }: { id: string }) {
   const query = useQuery(nftOptions(id))
   const { data: user } = useSession()
@@ -17,8 +17,20 @@ export function NftDetail({ id }: { id: string }) {
   const [quantity, setQuantity] = useState(1)
   if (query.isPending)
     return (
-      <main className="page">
-        <Loading />
+      <main className="page" role="status" aria-label="Carregando obra">
+        <div className="breadcrumbs" aria-hidden="true">
+          Carregando obra…
+        </div>
+        <div className="detail-grid" aria-hidden="true">
+          <div className="detail-loading-art" />
+          <div className="detail-loading-copy">
+            <div className="skeleton">
+              <div />
+              <span />
+              <span />
+            </div>
+          </div>
+        </div>
       </main>
     )
   if (query.error)

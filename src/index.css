@@ -1452,3 +1452,18 @@ footer,
     right: -10px;
   }
 }
+.detail-loading-art {
+  aspect-ratio: 1;
+  width: 100%;
+  border-radius: 20px;
+  background: linear-gradient(100deg, #f1eef5 20%, #faf8fc 45%, #f1eef5 70%);
+  background-size: 220% 100%;
+  animation: shimmer 1.5s infinite;
+}
+.detail-loading-copy {
+  min-height: 560px;
+}
+.breadcrumbs,
+.detail-copy > p {
+  color: #6b6176;
+}

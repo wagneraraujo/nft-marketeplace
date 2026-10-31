@@ -369,3 +369,21 @@ test('layout tablet e edição de carteira', async ({ page }) => {
 test.afterEach(async ({ page }) => {
   expect(await page.pageErrors()).toEqual([])
 })
+test('detalhe lento reserva o espaço da imagem antes dos dados', async ({
+  page,
+}) => {
+  await page.goto('/nfts/nft-1?scenario=slow')
+  const placeholder = page.locator('.detail-loading-art')
+  await expect(placeholder).toBeVisible()
+  const reserved = await placeholder.boundingBox()
+  await expect(
+    page.getByRole('heading', { name: 'Orbital dream #001' }),
+  ).toBeVisible()
+  const image = await page.locator('.detail-art').boundingBox()
+  expect(reserved).not.toBeNull()
+  expect(image).not.toBeNull()
+  expect(Math.abs((reserved?.width ?? 0) - (image?.width ?? 0))).toBeLessThan(1)
+  expect(Math.abs((reserved?.height ?? 0) - (image?.height ?? 0))).toBeLessThan(
+    1,
+  )
+})
