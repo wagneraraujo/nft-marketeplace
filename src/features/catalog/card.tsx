@@ -1,3 +1,4 @@
+import { artworkProps } from '@/lib/artwork'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Heart } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
@@ -25,7 +26,10 @@ export function NftCard({ nft }: { nft: Nft }) {
           aria-label={`Ver ${nft.name}`}
         >
           <img
-            src={nft.image}
+            {...artworkProps(
+              nft.image,
+              '(max-width: 700px) calc((100vw - 72px) / 2), (max-width: 1100px) 30vw, 258px',
+            )}
             alt={nft.name}
             width={720}
             height={720}

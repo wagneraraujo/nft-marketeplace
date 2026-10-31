@@ -1,3 +1,4 @@
+import { artworkProps } from '@/lib/artwork'
 import { useEffect, useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useNavigate, Link } from '@tanstack/react-router'
@@ -178,7 +179,7 @@ export function CheckoutPage() {
               cart.data?.items.map((item) => (
                 <div className="checkout-item" key={item.nft.id}>
                   <img
-                    src={item.nft.image}
+                    {...artworkProps(item.nft.image, '64px')}
                     alt={item.nft.name}
                     width={64}
                     height={64}

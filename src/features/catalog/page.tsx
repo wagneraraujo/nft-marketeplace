@@ -1,3 +1,4 @@
+import { artworkProps } from '@/lib/artwork'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
@@ -68,7 +69,10 @@ export function CatalogPage({
         </div>
         <img
           className="hero-ape"
-          src="/figma/8f387.png"
+          {...artworkProps(
+            '/figma/8f387.png',
+            '(max-width: 700px) 138px, (max-width: 1100px) 45vw, 450px',
+          )}
           alt="Emerald Ape, destaque da coleção Kurio"
           width={450}
           height={450}
@@ -76,7 +80,7 @@ export function CatalogPage({
         />
         <img
           className="hero-mini-ape"
-          src="/figma/83794.png"
+          {...artworkProps('/figma/83794.png', '58px')}
           alt=""
           width={58}
           height={58}
@@ -85,7 +89,14 @@ export function CatalogPage({
           •••
         </span>
       </section>
-      <section id="catalog" className="catalog-section">
+      <section
+        id="catalog"
+        className="catalog-section"
+        aria-labelledby="catalog-title"
+      >
+        <h2 id="catalog-title" className="sr-only">
+          Coleções de NFTs
+        </h2>
         <aside className={`catalog-sidebar ${filters ? 'is-open' : ''}`}>
           <div className="filter-group">
             <h2>Coleções</h2>
@@ -135,7 +146,10 @@ export function CatalogPage({
             <strong>OFERTA LIMITADA</strong>
             <Link to="/nfts/$id" params={{ id: 'nft-2' }}>
               <img
-                src="/figma/83794.png"
+                {...artworkProps(
+                  '/figma/83794.png',
+                  '(max-width: 1100px) 210px, 310px',
+                )}
                 alt="Sage Nomad #009"
                 width={310}
                 height={310}
@@ -251,7 +265,12 @@ export function CatalogPage({
       </section>
       <section className="promotions">
         <div>
-          <img src="/figma/8f387.png" alt="" width={285} height={250} />
+          <img
+            {...artworkProps('/figma/8f387.png', '285px')}
+            alt=""
+            width={285}
+            height={250}
+          />
           <div>
             <h2>
               Lançamentos gênesis
@@ -269,7 +288,12 @@ export function CatalogPage({
           </div>
         </div>
         <div>
-          <img src="/figma/9add2.png" alt="" width={285} height={250} />
+          <img
+            {...artworkProps('/figma/9add2.png', '285px')}
+            alt=""
+            width={285}
+            height={250}
+          />
           <div>
             <h2>
               Arte digital selecionada
@@ -303,7 +327,10 @@ export function CatalogPage({
           ].map(([image, title], i) => (
             <article key={title}>
               <img
-                src={`/figma/${image}`}
+                {...artworkProps(
+                  `/figma/${image}`,
+                  '(max-width: 1100px) 45vw, 268px',
+                )}
                 alt=""
                 width={268}
                 height={200}

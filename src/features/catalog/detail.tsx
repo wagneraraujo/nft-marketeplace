@@ -1,3 +1,4 @@
+import { artworkProps } from '@/lib/artwork'
 import { catalogOptions } from './queries'
 import { NftCard } from './card'
 import { QuantityControl } from '@/components/design/quantity'
@@ -30,22 +31,30 @@ export function NftDetail({ id }: { id: string }) {
   )
   if (query.isPending)
     return (
-      <main className="page" role="status" aria-label="Carregando obra">
+      <main
+        className="page detail-loading-page"
+        role="status"
+        aria-label="Carregando obra"
+      >
         <div className="breadcrumbs" aria-hidden="true">
           Carregando obra…
         </div>
         <div className="detail-grid" aria-hidden="true">
+          <div className="detail-mobile-back">
+            <span />
+            <span />
+          </div>
           <div className="detail-gallery">
             <div className="detail-thumbnails" />
             <div className="detail-loading-art" />
           </div>
-          <div className="detail-loading-copy">
+          <section className="detail-copy detail-loading-copy">
             <div className="skeleton">
               <div />
               <span />
               <span />
             </div>
-          </div>
+          </section>
         </div>
       </main>
     )
@@ -82,13 +91,21 @@ export function NftDetail({ id }: { id: string }) {
                 aria-pressed={activeImage === index}
                 onClick={() => setActiveImage(index)}
               >
-                <img src={nft.image} alt="" width={100} height={100} />
+                <img
+                  {...artworkProps(nft.image, '100px')}
+                  alt=""
+                  width={100}
+                  height={100}
+                />
               </button>
             ))}
           </div>
           <img
             className="detail-art"
-            src={nft.image}
+            {...artworkProps(
+              nft.image,
+              '(max-width: 700px) calc(100vw - 56px), (max-width: 1100px) 45vw, 444px',
+            )}
             alt={nft.name}
             width={444}
             height={444}

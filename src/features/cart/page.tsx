@@ -1,3 +1,4 @@
+import { artworkProps } from '@/lib/artwork'
 import { useState } from 'react'
 import { quoteOptions } from '@/features/checkout/api'
 import { storage } from '@/lib/storage'
@@ -79,7 +80,10 @@ export function CartPage() {
               <article className="cart-item" key={item.nft.id}>
                 <Link to="/nfts/$id" params={{ id: item.nft.id }}>
                   <img
-                    src={item.nft.image}
+                    {...artworkProps(
+                      item.nft.image,
+                      '(max-width: 700px) 100px, 70px',
+                    )}
                     alt={item.nft.name}
                     width={110}
                     height={110}
