@@ -69,7 +69,7 @@ Endpoints locais de controle: `POST /api/dev/scenario` com `{scenario}`, `POST /
 
 Veja [ARCHITECTURE.md](ARCHITECTURE.md), [guia para defesa técnica](docs/SOLUTION-GUIDE.md) e [plano de ação](docs/superpowers/plans/2026-10-31-nft-marketplace.md).
 
-A interface usa direção visual provisória e ilustrações SVG locais. O arquivo Figma fornecido é `Ff0SksUi7UFtPWUO8kyNtw`, página `0:1`; o MCP recusou a leitura por falta de acesso de edição da conta conectada. Fidelidade ao Figma permanece pendente. As ilustrações não foram extraídas do Figma. Nenhum resultado de testes ou pontuação deve ser presumido: consulte as evidências registradas em `docs/execution/progress.md`.
+A interface usa direção visual provisória e ilustrações SVG locais. A cópia Figma atual é `T3mb62CfaKKBEad1KGr5Qy`, página `0:1`; o acesso pelo MCP foi confirmado, com 15 frames principais identificados. Fidelidade ao Figma permanece pendente. As ilustrações não foram extraídas do Figma. Nenhum resultado de testes ou pontuação deve ser presumido: consulte as evidências registradas em `docs/execution/progress.md`.
 
 ## Deploy
 
@@ -79,4 +79,4 @@ Build: `yarn build`; saída: `dist`; variável: `VITE_ENABLE_MOCKS=true`. `verce
 
 Typecheck, lint e build aprovados. Instalação com lockfile congelado e build reproduzidos em pasta limpa. Playwright: **34 testes aprovados**, desktop/mobile, incluindo oito baselines visuais e verificações em 768 px. [Resultados Lighthouse](lighthouse/RESULTS.md): desktop 100 nas duas páginas; mobile 90 no início e 88 no detalhe. Accessibility, Best Practices e SEO: 100 em todas as combinações. O detalhe mobile permanece abaixo da meta de desempenho 90.
 
-O deploy público aguarda autorização da integração para a equipe Vercel. A interface continua provisória até obter leitura do Figma; nenhuma equivalência visual com o arquivo foi declarada.
+O deploy público aguarda autorização da integração para a equipe Vercel. A interface continua provisória até concluir a adaptação ao Figma; nenhuma equivalência visual com o arquivo foi declarada.

@@ -60,7 +60,7 @@ O cliente usa transporte WebSocket exclusivamente, namespace padrão e eventos J
 
 ## Interface, acessibilidade e desempenho
 
-Direção visual provisória: fundo claro, destaque violeta, cards de arte abstrata e tipografia Geist local. SVGs em `public/art` substituem assets do Figma enquanto a permissão estiver bloqueada. Não há comprovação de equivalência visual ao arquivo de referência.
+Direção visual provisória: fundo claro, destaque violeta, cards de arte abstrata e tipografia Geist local. SVGs em `public/art` são substitutos provisórios dos assets do Figma. O acesso à cópia `T3mb62CfaKKBEad1KGr5Qy` foi confirmado; extração de tokens/assets e adaptação ainda estão pendentes. Não há comprovação de equivalência visual ao arquivo de referência.
 
 Layout responsivo, campos com labels/erros associados, foco visível, link para pular navegação, feedback anunciado e skeletons dimensionados com preferência de movimento reduzido. Não foram introduzidos diálogos/drawers que exigiriam controle de foco adicional. Arte principal e fonte possuem preload; o build também antecipa a transferência do módulo MSW para evitar uma cascata de rede tardia; rotas têm code splitting e conexão Socket.IO é carregada quando há sessão.
 
