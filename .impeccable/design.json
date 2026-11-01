@@ -1,0 +1,346 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-31T18:46:54.958598+00:00",
+  "title": "Design System: Kurio",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Primary",
+        "tonalRamp": [
+          "oklch(15% 0.1177 59.70)",
+          "oklch(25% 0.1177 59.70)",
+          "oklch(35% 0.1177 59.70)",
+          "oklch(45% 0.1177 59.70)",
+          "oklch(55% 0.1177 59.70)",
+          "oklch(65% 0.1177 59.70)",
+          "oklch(80% 0.1177 59.70)",
+          "oklch(95% 0.1177 59.70)"
+        ],
+        "tonalRampPurpose": "Synthesized panel visualization only; not shipped palette tokens."
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Accent",
+        "tonalRamp": [
+          "oklch(15% 0.1261 61.21)",
+          "oklch(25% 0.1261 61.21)",
+          "oklch(35% 0.1261 61.21)",
+          "oklch(45% 0.1261 61.21)",
+          "oklch(55% 0.1261 61.21)",
+          "oklch(65% 0.1261 61.21)",
+          "oklch(80% 0.1261 61.21)",
+          "oklch(95% 0.1261 61.21)"
+        ],
+        "tonalRampPurpose": "Synthesized panel visualization only; not shipped palette tokens."
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Background",
+        "tonalRamp": [
+          "oklch(15% 0.0136 44.32)",
+          "oklch(25% 0.0136 44.32)",
+          "oklch(35% 0.0136 44.32)",
+          "oklch(45% 0.0136 44.32)",
+          "oklch(55% 0.0136 44.32)",
+          "oklch(65% 0.0136 44.32)",
+          "oklch(80% 0.0136 44.32)",
+          "oklch(95% 0.0136 44.32)"
+        ],
+        "tonalRampPurpose": "Synthesized panel visualization only; not shipped palette tokens."
+      },
+      "card": {
+        "role": "neutral",
+        "displayName": "Card",
+        "tonalRamp": [
+          "oklch(15% 0.0243 36.60)",
+          "oklch(25% 0.0243 36.60)",
+          "oklch(35% 0.0243 36.60)",
+          "oklch(45% 0.0243 36.60)",
+          "oklch(55% 0.0243 36.60)",
+          "oklch(65% 0.0243 36.60)",
+          "oklch(80% 0.0243 36.60)",
+          "oklch(95% 0.0243 36.60)"
+        ],
+        "tonalRampPurpose": "Synthesized panel visualization only; not shipped palette tokens."
+      },
+      "raised": {
+        "role": "neutral",
+        "displayName": "Raised",
+        "tonalRamp": [
+          "oklch(15% 0.0320 44.79)",
+          "oklch(25% 0.0320 44.79)",
+          "oklch(35% 0.0320 44.79)",
+          "oklch(45% 0.0320 44.79)",
+          "oklch(55% 0.0320 44.79)",
+          "oklch(65% 0.0320 44.79)",
+          "oklch(80% 0.0320 44.79)",
+          "oklch(95% 0.0320 44.79)"
+        ],
+        "tonalRampPurpose": "Synthesized panel visualization only; not shipped palette tokens."
+      },
+      "secondary": {
+        "role": "secondary",
+        "displayName": "Secondary",
+        "tonalRamp": [
+          "oklch(15% 0.0455 59.98)",
+          "oklch(25% 0.0455 59.98)",
+          "oklch(35% 0.0455 59.98)",
+          "oklch(45% 0.0455 59.98)",
+          "oklch(55% 0.0455 59.98)",
+          "oklch(65% 0.0455 59.98)",
+          "oklch(80% 0.0455 59.98)",
+          "oklch(95% 0.0455 59.98)"
+        ],
+        "tonalRampPurpose": "Synthesized panel visualization only; not shipped palette tokens."
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Foreground",
+        "tonalRamp": [
+          "oklch(15% 0.0091 78.28)",
+          "oklch(25% 0.0091 78.28)",
+          "oklch(35% 0.0091 78.28)",
+          "oklch(45% 0.0091 78.28)",
+          "oklch(55% 0.0091 78.28)",
+          "oklch(65% 0.0091 78.28)",
+          "oklch(80% 0.0091 78.28)",
+          "oklch(95% 0.0091 78.28)"
+        ],
+        "tonalRampPurpose": "Synthesized panel visualization only; not shipped palette tokens."
+      },
+      "muted-foreground": {
+        "role": "neutral",
+        "displayName": "Muted Foreground",
+        "tonalRamp": [
+          "oklch(15% 0.0612 74.20)",
+          "oklch(25% 0.0612 74.20)",
+          "oklch(35% 0.0612 74.20)",
+          "oklch(45% 0.0612 74.20)",
+          "oklch(55% 0.0612 74.20)",
+          "oklch(65% 0.0612 74.20)",
+          "oklch(80% 0.0612 74.20)",
+          "oklch(95% 0.0612 74.20)"
+        ],
+        "tonalRampPurpose": "Synthesized panel visualization only; not shipped palette tokens."
+      },
+      "text-secondary": {
+        "role": "neutral",
+        "displayName": "Text Secondary",
+        "tonalRamp": [
+          "oklch(15% 0.0755 78.43)",
+          "oklch(25% 0.0755 78.43)",
+          "oklch(35% 0.0755 78.43)",
+          "oklch(45% 0.0755 78.43)",
+          "oklch(55% 0.0755 78.43)",
+          "oklch(65% 0.0755 78.43)",
+          "oklch(80% 0.0755 78.43)",
+          "oklch(95% 0.0755 78.43)"
+        ],
+        "tonalRampPurpose": "Synthesized panel visualization only; not shipped palette tokens."
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Border",
+        "tonalRamp": [
+          "oklch(15% 0.0593 48.59)",
+          "oklch(25% 0.0593 48.59)",
+          "oklch(35% 0.0593 48.59)",
+          "oklch(45% 0.0593 48.59)",
+          "oklch(55% 0.0593 48.59)",
+          "oklch(65% 0.0593 48.59)",
+          "oklch(80% 0.0593 48.59)",
+          "oklch(95% 0.0593 48.59)"
+        ],
+        "tonalRampPurpose": "Synthesized panel visualization only; not shipped palette tokens."
+      },
+      "divider": {
+        "role": "neutral",
+        "displayName": "Divider",
+        "tonalRamp": [
+          "oklch(15% 0.0466 40.34)",
+          "oklch(25% 0.0466 40.34)",
+          "oklch(35% 0.0466 40.34)",
+          "oklch(45% 0.0466 40.34)",
+          "oklch(55% 0.0466 40.34)",
+          "oklch(65% 0.0466 40.34)",
+          "oklch(80% 0.0466 40.34)",
+          "oklch(95% 0.0466 40.34)"
+        ],
+        "tonalRampPurpose": "Synthesized panel visualization only; not shipped palette tokens."
+      },
+      "error": {
+        "role": "neutral",
+        "displayName": "Error",
+        "tonalRamp": [
+          "oklch(15% 0.1005 36.06)",
+          "oklch(25% 0.1005 36.06)",
+          "oklch(35% 0.1005 36.06)",
+          "oklch(45% 0.1005 36.06)",
+          "oklch(55% 0.1005 36.06)",
+          "oklch(65% 0.1005 36.06)",
+          "oklch(80% 0.1005 36.06)",
+          "oklch(95% 0.1005 36.06)"
+        ],
+        "tonalRampPurpose": "Synthesized panel visualization only; not shipped palette tokens."
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Desktop hero heading."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Default/detail h1."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Section heading."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Reading text and controls."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Compact metadata."
+      }
+    },
+    "shadows": [
+      {
+        "name": "auth-overlay",
+        "value": "0 8px 40px #0003",
+        "purpose": "Desktop auth dialog."
+      },
+      {
+        "name": "mobile-purchase-dock",
+        "value": "0 -10px 25px #140d0a38",
+        "purpose": "Separate the fixed mobile purchase dock."
+      }
+    ],
+    "motion": [
+      {
+        "name": "button-background",
+        "value": "background 0.15s",
+        "purpose": "Shared button state transition."
+      },
+      {
+        "name": "skeleton-pulse",
+        "value": "pulse 1.5s ease-in-out infinite",
+        "purpose": "Loading skeleton opacity pulse."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation: none !important; transition: none !important; scroll-behavior: auto !important",
+        "purpose": "All elements and pseudo-elements under prefers-reduced-motion: reduce."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "mobile-max",
+        "value": "700px"
+      },
+      {
+        "name": "tablet-min",
+        "value": "701px"
+      },
+      {
+        "name": "tablet-max",
+        "value": "1100px"
+      },
+      {
+        "name": "wide-min",
+        "value": "1600px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary Button extracted from shipped Kurio styles.",
+      "html": "<button class=\"ds-primary\">Continuar</button>",
+      "css": ".ds-primary{font-family:var(--font-sans, 'Roboto Mono', monospace);display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:35px;padding:7px 20px;border:1px solid var(--border,#55321f);border-radius:4px;font-size:14px;font-weight:500;box-shadow:none;transition:background .15s;background:var(--primary,#d28a4c);color:var(--background,#140d0a);}.ds-primary:hover{filter:brightness(1.1)}.ds-primary:focus-visible{outline:2px solid #e89b55;outline-offset:4px;}.ds-primary:disabled{opacity:.5;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none}}"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Outline Button extracted from shipped Kurio styles.",
+      "html": "<button class=\"ds-outline\">Continuar</button>",
+      "css": ".ds-outline{font-family:var(--font-sans, 'Roboto Mono', monospace);display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:35px;padding:7px 20px;border:1px solid var(--border,#55321f);border-radius:4px;font-size:14px;font-weight:500;box-shadow:none;transition:background .15s;background:transparent;color:var(--foreground,#f5f1eb);}.ds-outline:hover{filter:brightness(1.1)}.ds-outline:focus-visible{outline:2px solid #e89b55;outline-offset:4px;}.ds-outline:disabled{opacity:.5;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-outline{transition:none}}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Text Field extracted from shipped Kurio styles.",
+      "html": "<label class=\"ds-field\">Nome<input placeholder=\"Seu nome\"></label>",
+      "css": ".ds-field{font-family:var(--font-sans, 'Roboto Mono', monospace);display:flex;flex-direction:column;gap:8px;color:var(--muted-foreground,#cfb28c);font-size:14px}.ds-field input{font-family:var(--font-sans, 'Roboto Mono', monospace);height:44px;padding:11px 14px;border:1px solid var(--border,#55321f);border-radius:4px;background:transparent;color:var(--foreground,#f5f1eb);min-width:0}.ds-field input::placeholder{color:#b39463}.ds-field input:focus-visible{outline:2px solid #e89b55;outline-offset:4px;}"
+    },
+    {
+      "name": "Trait Chip",
+      "kind": "chip",
+      "refersTo": "trait-chip",
+      "description": "Trait Chip extracted from shipped Kurio styles.",
+      "html": "<span class=\"ds-trait\">Raridade: raro</span>",
+      "css": ".ds-trait{font-family:var(--font-sans, 'Roboto Mono', monospace);display:inline-block;border:1px solid var(--border,#55321f);border-radius:20px;padding:4px 10px;font-size:12px;color:var(--muted-foreground,#cfb28c)}"
+    },
+    {
+      "name": "Catalog Card",
+      "kind": "card",
+      "refersTo": "card-art",
+      "description": "Artwork frame and title/price geometry. Neutral artwork slot avoids substituting another image for an original raster asset.",
+      "html": "<article class=\"ds-card\"><div class=\"ds-art\"><span>Artwork slot</span></div><h3>Emerald Ape</h3><p>0.15 ETH</p></article>",
+      "css": ".ds-card{font-family:var(--font-sans, 'Roboto Mono', monospace);width:258px;color:var(--foreground,#f5f1eb)}.ds-art{background:var(--card,#241612);padding:25px 4px;border-radius:4px}.ds-art span{display:grid;place-items:center;aspect-ratio:1;border-radius:8px;background:var(--accent,#2f1d15);color:var(--muted-foreground,#cfb28c);font-size:12px}.ds-card h3{font-size:14px;line-height:20px;font-weight:400;margin:12px 0 0}.ds-card p{font-size:15px;font-weight:700;color:#e89b55;margin:3px 0 0}"
+    },
+    {
+      "name": "Header Navigation",
+      "kind": "nav",
+      "description": "Header Navigation extracted from shipped Kurio styles.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Principal\"><a href=\"#home\" aria-current=\"page\">Explorar</a><a href=\"#favorites\">Favoritos</a></nav>",
+      "css": ".ds-nav{font-family:var(--font-sans, 'Roboto Mono', monospace);display:flex;gap:44px;height:77px;color:var(--foreground,#f5f1eb);border-bottom:1px solid #3f2319}.ds-nav a{display:flex;align-items:center;position:relative;color:inherit;text-decoration:none;font-size:14px}.ds-nav a[aria-current]{color:var(--primary,#d28a4c)}.ds-nav a[aria-current]:after{content:\"\";position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--primary,#d28a4c)}.ds-nav a:focus-visible{outline:2px solid #e89b55;outline-offset:4px;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Kurio coffee/copper marketplace",
+    "overview": "Kurio is the approved coffee/copper marketplace from Figma T3mb62CfaKKBEad1KGr5Qy. Compact monospaced text, warm dark fields and original ape portraits give a dense catalog a consistent identity. This records the shipped React implementation; the source reference settles the visual direction.\n\nDesktop uses an open catalog with a sidebar and flat surfaces. Mobile changes composition: rounded artwork containers, staggered catalog columns, a bottom navigation shelf and purchase docks. Quotes, account values and receipt snapshots remain real mock data, so sample Figma prices are not visual constants.",
+    "keyCharacteristics": [
+      "Coffee fields with copper actions and prices.",
+      "One local monospaced family, differentiated by size and weight.",
+      "Original raster artwork at focal scale.",
+      "Flat desktop surfaces and rounded mobile shelves."
+    ],
+    "rules": [
+      {
+        "name": "The Copper Action Rule",
+        "body": "Use copper for primary actions, prices and selected navigation; keep long reading text in the warm neutral text colors.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Family Rule",
+        "body": "Use local Roboto Mono for headings, prose, controls and metadata.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tonal Surface Rule",
+        "body": "Separate ordinary surfaces with warm fields and fine borders; reserve shadows for the auth overlay and mobile purchase dock.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use the approved local artwork and the shared coffee/copper tokens.",
+      "Do preserve visible keyboard focus and reduced-motion handling.",
+      "Do let narrow layouts recompose into the shipped mobile patterns.",
+      "Do show actual saved fields, quote totals and order snapshots with explicit simulation wording."
+    ],
+    "donts": [
+      "Don't use frame screenshots as UI or substitute unrelated artwork in an NFT gallery.",
+      "Don't introduce another display family or decorative hard offset shadows.",
+      "Don't present unavailable social, payment or blockchain operations as working controls.",
+      "Don't extend the reference-specific hero welcome label into a general eyebrow pattern."
+    ]
+  }
+}

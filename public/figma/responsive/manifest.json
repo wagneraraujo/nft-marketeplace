@@ -1,0 +1,135 @@
+{
+  "widths": [
+    320,
+    640,
+    960,
+    1254
+  ],
+  "quality": 90,
+  "assets": [
+    {
+      "source": "8f387.png",
+      "sourceBytes": 1885435,
+      "sourceSha256": "f20b58b99de12b6eceede2090607e4b999275bba95de7674bb14f26b59666b21",
+      "variants": [
+        {
+          "file": "8f387-320.webp",
+          "width": 320,
+          "bytes": 16882,
+          "lossless": false
+        },
+        {
+          "file": "8f387-640.webp",
+          "width": 640,
+          "bytes": 47866,
+          "lossless": false
+        },
+        {
+          "file": "8f387-960.webp",
+          "width": 960,
+          "bytes": 91520,
+          "lossless": false
+        },
+        {
+          "file": "8f387-1254.webp",
+          "width": 1254,
+          "bytes": 132742,
+          "lossless": false
+        }
+      ]
+    },
+    {
+      "source": "83794.png",
+      "sourceBytes": 2068526,
+      "sourceSha256": "9b25d8d72395aa62f919f6ad33b95b7ba7bbfee6049e95cf159a319b03ecb8d9",
+      "variants": [
+        {
+          "file": "83794-320.webp",
+          "width": 320,
+          "bytes": 14892,
+          "lossless": false
+        },
+        {
+          "file": "83794-640.webp",
+          "width": 640,
+          "bytes": 49346,
+          "lossless": false
+        },
+        {
+          "file": "83794-960.webp",
+          "width": 960,
+          "bytes": 112220,
+          "lossless": false
+        },
+        {
+          "file": "83794-1254.webp",
+          "width": 1254,
+          "bytes": 182262,
+          "lossless": false
+        }
+      ]
+    },
+    {
+      "source": "9add2.png",
+      "sourceBytes": 2027336,
+      "sourceSha256": "326df4c1c08c31c88b9f407e51be3991e46667183af62aa1501927adc76f52b5",
+      "variants": [
+        {
+          "file": "9add2-320.webp",
+          "width": 320,
+          "bytes": 13152,
+          "lossless": false
+        },
+        {
+          "file": "9add2-640.webp",
+          "width": 640,
+          "bytes": 42190,
+          "lossless": false
+        },
+        {
+          "file": "9add2-960.webp",
+          "width": 960,
+          "bytes": 84008,
+          "lossless": false
+        },
+        {
+          "file": "9add2-1254.webp",
+          "width": 1254,
+          "bytes": 128050,
+          "lossless": false
+        }
+      ]
+    },
+    {
+      "source": "b7cfc.png",
+      "sourceBytes": 1978600,
+      "sourceSha256": "2a42ba5adc341c3d0e1ad6905058e2762d995fc988113a7cd28b0d15f6a4ba28",
+      "variants": [
+        {
+          "file": "b7cfc-320.webp",
+          "width": 320,
+          "bytes": 17524,
+          "lossless": false
+        },
+        {
+          "file": "b7cfc-640.webp",
+          "width": 640,
+          "bytes": 56262,
+          "lossless": false
+        },
+        {
+          "file": "b7cfc-960.webp",
+          "width": 960,
+          "bytes": 116640,
+          "lossless": false
+        },
+        {
+          "file": "b7cfc-1254.webp",
+          "width": 1254,
+          "bytes": 181086,
+          "lossless": false
+        }
+      ]
+    }
+  ]
+}
