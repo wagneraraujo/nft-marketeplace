@@ -94,7 +94,8 @@ await writeFile(
     teamId: candidate.teamId,
     requestBody: {
       name: candidate.projectName,
-      target: candidate.environment,
+      target:
+        candidate.environment === 'preview' ? 'staging' : candidate.environment,
       projectSettings: settings,
       files,
       meta: { sourceCommit, purpose: 'Kurio challenge preview' },
