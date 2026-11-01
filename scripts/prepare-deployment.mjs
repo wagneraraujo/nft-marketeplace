@@ -15,6 +15,9 @@ const root = fileURLToPath(new URL('../', import.meta.url))
 const sourceCommit = process.argv[2]
 if (!/^[a-f0-9]{40}$/.test(sourceCommit ?? ''))
   throw new Error('Provide the reviewed commit SHA as the first argument.')
+const teamId = process.argv[3]
+if (!/^team_[A-Za-z0-9]+$/.test(teamId ?? ''))
+  throw new Error('Provide the target Vercel team ID as the second argument.')
 const output = await mkdtemp(join(tmpdir(), 'kurio-deployment-'))
 const source = join(output, 'source')
 const paths = [
@@ -62,7 +65,7 @@ const settings = {
   outputDirectory: 'dist',
 }
 const candidate = {
-  teamId: 'team_AaVPcIFMVz2BYzyg6va5Q0Zj',
+  teamId,
   projectName: 'kurio-nft-marketplace',
   environment: 'preview',
   sourceCommit,
@@ -91,6 +94,7 @@ await writeFile(
     teamId: candidate.teamId,
     requestBody: {
       name: candidate.projectName,
+      target: candidate.environment,
       projectSettings: settings,
       files,
       meta: { sourceCommit, purpose: 'Kurio challenge preview' },

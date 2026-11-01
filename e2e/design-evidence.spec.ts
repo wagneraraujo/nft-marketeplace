@@ -53,7 +53,9 @@ test('Kurio: evidência visual e ausência de overflow nos fluxos', async ({
     page.getByRole('heading', { name: 'Emerald Ape #042', exact: true }),
   ).toBeVisible()
   await capture('detail')
-  await page.getByRole('button', { name: 'Adicionar ao carrinho' }).click()
+  await page
+    .getByRole('button', { name: 'Comprar NFT: adicionar ao carrinho' })
+    .click()
   await expect(page.getByText('NFT adicionado ao carrinho.')).toBeVisible()
   await page.goto('/cart')
   await expect(page.locator('.cart-item')).toHaveCount(1)

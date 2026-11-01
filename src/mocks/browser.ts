@@ -8,6 +8,8 @@ import { controlHandlers } from './handlers/control'
 import { socketHandlers } from './socket'
 import { initialize, reset } from './db'
 import { configureScenario, setScenario } from './scenarios'
+import { api } from '@/lib/api'
+import { createMockActivationGate } from './ensure-active'
 export async function startMocks() {
   await initialize()
   if (new URLSearchParams(location.search).get('reset') === '1') {
@@ -30,5 +32,10 @@ export async function startMocks() {
       if (new URL(request.url).pathname.startsWith('/api/')) print.error()
     },
     quiet: true,
+  })
+  const ensureActive = createMockActivationGate()
+  api.interceptors.request.use(async (config) => {
+    await ensureActive()
+    return config
   })
 }

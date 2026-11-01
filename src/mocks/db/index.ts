@@ -66,7 +66,7 @@ export async function reset() {
   )
   db = {
     schema: 1,
-    presentationVersion: 2,
+    presentationVersion: 4,
     users,
     nfts: structuredClone(seedNfts),
     carts: {},
@@ -86,7 +86,7 @@ export async function initialize() {
       const parsed = JSON.parse(value) as Database
       if (parsed.schema === 1) {
         db = parsed
-        if (db.presentationVersion !== 2) {
+        if (db.presentationVersion !== 4) {
           db.nfts = db.nfts.map((nft) => {
             const current = seedNfts.find((item) => item.id === nft.id)
             return current
@@ -96,11 +96,13 @@ export async function initialize() {
                   image: current.image,
                   collection: current.collection,
                   creator: current.creator,
+                  category: current.category,
+                  presentation: current.presentation,
                   description: current.description,
                 }
               : nft
           })
-          db.presentationVersion = 2
+          db.presentationVersion = 4
           save()
         }
         return

@@ -6,8 +6,15 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { toast } from 'sonner'
-import { ShieldCheck, ArrowUpRight, ChevronLeft, Heart } from 'lucide-react'
-import { nftOptions } from './queries'
+import { ChevronLeft, Heart, X } from 'lucide-react'
+import { Dialog } from '@base-ui/react/dialog'
+import { AssetIcon } from '@/components/design/asset-icon'
+import {
+  favoriteOptions,
+  useFavoriteMutation,
+} from '@/features/favorites/queries'
+import { NftTabs } from './nft-tabs'
+import { nftOptions, reviewsOptions } from './queries'
 import { useCartMutation } from '@/features/cart/queries'
 import { useSession } from '@/features/auth/use-session'
 import { formatEth } from '@/lib/decimal'
@@ -18,6 +25,10 @@ export function NftDetail({ id }: { id: string }) {
   const query = useQuery(nftOptions(id))
   const { data: user } = useSession()
   const mutation = useCartMutation(user?.id)
+  const favorites = useQuery(favoriteOptions(user?.id))
+  const favorite = useFavoriteMutation(user?.id)
+  const reviews = useQuery(reviewsOptions(id))
+  const [tab, setTab] = useState('details')
   const [quantity, setQuantity] = useState(1)
   const [activeImage, setActiveImage] = useState(0)
   const related = useQuery(
@@ -46,7 +57,9 @@ export function NftDetail({ id }: { id: string }) {
           </div>
           <div className="detail-gallery">
             <div className="detail-thumbnails" />
-            <div className="detail-loading-art" />
+            <div className="detail-art-frame">
+              <div className="detail-loading-art" />
+            </div>
           </div>
           <section className="detail-copy detail-loading-copy">
             <div className="skeleton">
@@ -69,9 +82,9 @@ export function NftDetail({ id }: { id: string }) {
   return (
     <main className="page">
       <div className="breadcrumbs">
-        <Link to="/">Explorar</Link>
+        <Link to="/">Início</Link>
         <span>/</span>
-        <span>{nft.collection}</span>
+        <Link to="/">Mercado</Link>
       </div>
       <div className="detail-grid">
         <div className="detail-mobile-back">
@@ -100,43 +113,120 @@ export function NftDetail({ id }: { id: string }) {
               </button>
             ))}
           </div>
-          <img
-            className="detail-art"
-            {...artworkProps(
-              nft.image,
-              '(max-width: 700px) calc(100vw - 56px), (max-width: 1100px) 45vw, 444px',
-            )}
-            alt={nft.name}
-            width={444}
-            height={444}
-            fetchPriority="high"
-          />
+          <div className="detail-art-frame">
+            <img
+              className="detail-art"
+              {...artworkProps(
+                nft.image,
+                '(max-width: 700px) calc(100vw - 56px), (max-width: 1100px) 45vw, 404px',
+              )}
+              alt={nft.name}
+              width={404}
+              height={404}
+              fetchPriority="high"
+            />
+            <Dialog.Root>
+              <Dialog.Trigger className="detail-zoom" aria-label="Ampliar obra">
+                <AssetIcon src="/figma/9ae7b.svg" />
+              </Dialog.Trigger>
+              <Dialog.Portal>
+                <Dialog.Backdrop className="art-zoom-backdrop" />
+                <Dialog.Popup className="art-zoom-dialog">
+                  <Dialog.Title className="sr-only">{nft.name}</Dialog.Title>
+                  <img
+                    {...artworkProps(nft.image, '90vw')}
+                    alt={nft.name}
+                    width={960}
+                    height={960}
+                  />
+                  <Dialog.Close
+                    className="art-zoom-close"
+                    aria-label="Fechar ampliação"
+                  >
+                    <X />
+                  </Dialog.Close>
+                </Dialog.Popup>
+              </Dialog.Portal>
+            </Dialog.Root>
+          </div>
         </div>
         <section className="detail-copy">
           <h1>{nft.name}</h1>
-          <p className="muted">
-            Criado por <strong>{nft.creator}</strong>
-          </p>
-          <p>{nft.description}</p>
-          <div className="traits">
-            <span>{nft.category}</span>
-            <span>{nft.rarity}</span>
-            <span>{nft.stock} edições disponíveis</span>
+          <div className="detail-price-row">
+            <strong className="detail-price">{formatEth(nft.price)}</strong>
+            <a
+              href="#nft-tabs"
+              className="detail-rating"
+              onClick={() => setTab('reviews')}
+            >
+              <span className="detail-stars" aria-hidden="true">
+                {[0, 1, 2, 3, 4].map((star) => (
+                  <AssetIcon
+                    key={star}
+                    src={star === 4 ? '/figma/89357.svg' : '/figma/19a5f.svg'}
+                  />
+                ))}
+              </span>
+              {reviews.data
+                ? `${reviews.data.total} avaliações de colecionadores`
+                : 'Avaliações de colecionadores'}
+              <span className="detail-mobile-rating" aria-hidden="true">
+                ★ {reviews.data?.average.toFixed(1)}({reviews.data?.total})
+              </span>
+            </a>
+          </div>
+          <div className="detail-about">
+            <h2>Sobre este NFT:</h2>
+            <p>{nft.description}</p>
+          </div>
+          <div className="detail-editions">
+            <h2>Edição:</h2>
+            <div
+              aria-label={`Edição ${nft.presentation?.edition ?? 'limitada'}`}
+            >
+              {['1/1', '1/10', '1/50', 'ABERTA'].map((edition, index) => (
+                <span
+                  key={edition}
+                  className={
+                    edition === nft.presentation?.edition ? 'is-current' : ''
+                  }
+                >
+                  <AssetIcon
+                    src={
+                      [
+                        '/figma/091e2.svg',
+                        '/figma/a9dab.svg',
+                        '/figma/c4842.svg',
+                        '/figma/6605d.svg',
+                      ][index]
+                    }
+                  />
+                  <span>{edition}</span>
+                </span>
+              ))}
+            </div>
           </div>
           <div className="purchase-box">
-            <small>Preço por edição</small>
-            <h2>{formatEth(nft.price)}</h2>
+            <strong className="purchase-mobile-price">
+              {formatEth(nft.price)}
+            </strong>
             <label className="field">
-              Quantidade
+              <span className="detail-quantity-caption">Qtd.</span>
               <QuantityControl
                 value={quantity}
                 max={Math.min(10, nft.stock)}
                 onChange={setQuantity}
                 label={nft.name}
+                detail
               />
             </label>
             <Button
-              className="wide"
+              className="detail-buy"
+              aria-label={
+                nft.stock
+                  ? 'Comprar NFT: adicionar ao carrinho'
+                  : 'Edição esgotada'
+              }
               disabled={
                 !nft.stock ||
                 mutation.isPending ||
@@ -155,43 +245,104 @@ export function NftDetail({ id }: { id: string }) {
                 )
               }
             >
-              {mutation.isPending
-                ? 'Adicionando…'
-                : nft.stock
-                  ? 'Adicionar ao carrinho'
-                  : 'Edição esgotada'}
-              <ArrowUpRight size={18} />
+              {mutation.isPending ? (
+                'Adicionando…'
+              ) : nft.stock ? (
+                <>
+                  <span className="detail-buy-desktop">COMPRAR</span>
+                  <span className="detail-buy-mobile">Comprar NFT</span>
+                </>
+              ) : (
+                'Edição esgotada'
+              )}
             </Button>
-            {mutation.isSuccess && (
-              <Link className="text-link" to="/cart">
-                Ver carrinho →
+            {user ? (
+              <Button
+                variant="outline"
+                className="detail-favorite"
+                aria-pressed={favorites.data?.includes(id) ?? false}
+                disabled={favorite.isPending}
+                onClick={() =>
+                  favorite.mutate(
+                    { id, active: !favorites.data?.includes(id) },
+                    { onError: (error) => toast.error(errorMessage(error)) },
+                  )
+                }
+              >
+                {favorites.data?.includes(id) ? (
+                  <Heart size={20} fill="currentColor" />
+                ) : (
+                  <AssetIcon src="/figma/d427d.svg" />
+                )}
+                {favorites.data?.includes(id) ? 'Favoritado' : 'Favoritar'}
+              </Button>
+            ) : (
+              <Link
+                className="button detail-favorite"
+                to="/login"
+                search={{ redirect: `/nfts/${id}` }}
+              >
+                <AssetIcon src="/figma/d427d.svg" />
+                Favoritar
               </Link>
             )}
+            <Link
+              className="detail-mobile-cart"
+              to="/cart"
+              aria-label="Ver carrinho"
+            >
+              <AssetIcon src="/figma/3c537.svg" />
+            </Link>
           </div>
-          <p className="trust">
-            <ShieldCheck size={18} /> Valores e disponibilidade são revisados
-            antes da compra.
-          </p>
-          {query.isFetching && (
-            <p role="status">Atualizando disponibilidade…</p>
+          {mutation.isSuccess && (
+            <Link className="text-link detail-cart-next" to="/cart">
+              Ver carrinho →
+            </Link>
           )}
+          <dl className="detail-metadata">
+            <div>
+              <dt>ID do token:</dt>
+              <dd>{nft.presentation?.tokenId ?? nft.id}</dd>
+            </div>
+            <div>
+              <dt>Coleção:</dt>
+              <dd>{nft.collection}</dd>
+            </div>
+            <div>
+              <dt>Atributos:</dt>
+              <dd>{nft.presentation?.attributes.join(', ') ?? nft.rarity}</dd>
+            </div>
+          </dl>
+          <div className="detail-share">
+            <strong>Compartilhar este NFT:</strong>
+            <a
+              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(location.href)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Compartilhar no LinkedIn"
+            >
+              <AssetIcon src="/figma/a4abe.svg" />
+            </a>
+            <a
+              href={`mailto:?subject=${encodeURIComponent(nft.name)}&body=${encodeURIComponent(location.href)}`}
+              aria-label="Compartilhar por e-mail"
+            >
+              <AssetIcon src="/figma/bec29.svg" />
+            </a>
+            <a
+              href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(location.href)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Compartilhar no X"
+            >
+              <AssetIcon src="/figma/fbcbd.svg" />
+            </a>
+          </div>
         </section>
       </div>
-      <section className="detail-description">
-        <h2>Descrição do NFT</h2>
-        <p>{nft.description}</p>
-        <p>
-          A coleção {nft.collection} reúne personagens com identidade própria e
-          atributos selecionados por {nft.creator}. Consulte a disponibilidade e
-          revise a cotação antes de concluir sua compra.
-        </p>
-        <p>
-          ID do token: {nft.id} · Categoria: {nft.category} · Raridade:{' '}
-          {nft.rarity}
-        </p>
-      </section>
+      <NftTabs nft={nft} reviews={reviews} value={tab} onChange={setTab} />
       <section className="related">
-        <h2>Você também pode gostar</h2>
+        <h2>Mais desta coleção</h2>
         <div className="nft-grid">
           {related.data?.items
             .filter((item) => item.id !== id)

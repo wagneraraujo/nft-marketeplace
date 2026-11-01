@@ -3,7 +3,8 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { ArrowRight, Search, SlidersHorizontal } from 'lucide-react'
-import type { CatalogSearch } from '@/contracts'
+import { catalogCategories, type CatalogSearch } from '@/contracts'
+import { PriceFilter } from './price-filter'
 import { catalogOptions } from './queries'
 import { NftCard } from './card'
 import { Loading, ErrorState, Empty } from '@/components/feedback/states'
@@ -101,23 +102,38 @@ export function CatalogPage({
           <div className="filter-group">
             <h2>Coleções</h2>
             {[
-              ['', 'Todas as coleções'],
-              ['Arte', 'Arte digital'],
-              ['Fotografia', 'Fotografia'],
-              ['Colecionáveis', 'Colecionáveis'],
-            ].map(([value, label]) => (
-              <button
+              { value: '', label: 'Todas as coleções' },
+              ...catalogCategories,
+            ].map(({ value, label }) => (
+              <Link
                 key={value}
-                aria-pressed={search.category === value}
-                onClick={() =>
-                  onSearch({ ...search, category: value, page: 1 })
-                }
+                to="/"
+                search={{ ...search, category: value, page: 1 }}
+                resetScroll={false}
+                aria-current={search.category === value ? 'true' : undefined}
+                className={search.category === value ? 'is-selected' : ''}
               >
                 {label}
-                <span>{value ? '12' : '36'}</span>
-              </button>
+                <span>
+                  (
+                  {value
+                    ? (result.data?.categories.find(
+                        (category) => category.value === value,
+                      )?.count ?? '…')
+                    : (result.data?.categories.reduce(
+                        (sum, category) => sum + category.count,
+                        0,
+                      ) ?? '…')}
+                  )
+                </span>
+              </Link>
             ))}
           </div>
+          <PriceFilter
+            key={`${search.minPrice ?? ''}:${search.maxPrice ?? ''}`}
+            search={search}
+            onSearch={onSearch}
+          />
           <div className="filter-group">
             <h2>Raridade</h2>
             {['', 'Comum', 'Raro', 'Épico'].map((value) => (
@@ -221,6 +237,8 @@ export function CatalogPage({
                     q: '',
                     category: '',
                     rarity: '',
+                    minPrice: undefined,
+                    maxPrice: undefined,
                     sort: 'newest',
                     page: 1,
                   })

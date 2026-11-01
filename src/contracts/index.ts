@@ -47,7 +47,28 @@ export const searchSchema = z.object({
   rarity: z.string().catch(''),
   sort: z.enum(['newest', 'price-asc', 'price-desc']).catch('newest'),
   page: z.coerce.number().int().positive().catch(1),
+  minPrice: z
+    .string()
+    .regex(/^\d+(\.\d{1,6})?$/)
+    .optional()
+    .catch(undefined),
+  maxPrice: z
+    .string()
+    .regex(/^\d+(\.\d{1,6})?$/)
+    .optional()
+    .catch(undefined),
 })
+export const catalogCategories = [
+  { value: 'Arte', label: 'Arte digital' },
+  { value: 'Fotografia', label: 'Fotografia' },
+  { value: 'Música', label: 'Música' },
+  { value: 'Arte 3D', label: 'Arte 3D' },
+  { value: 'Colecionáveis', label: 'Colecionáveis' },
+  { value: 'Generativa', label: 'Generativa' },
+  { value: 'Jogos', label: 'Jogos' },
+  { value: 'Assinaturas', label: 'Assinaturas' },
+  { value: 'Utilidade', label: 'Utilidade' },
+] as const
 export type CatalogSearch = z.infer<typeof searchSchema>
 export interface User {
   username?: string
@@ -74,11 +95,26 @@ export interface Nft {
   version: number
   image: string
   description: string
+  presentation?: {
+    edition: string
+    tokenId: string
+    attributes: string[]
+    paragraphs: string[]
+    network: string
+    contract: string
+    royalties: string
+  }
+}
+export interface NftReviews {
+  items: { id: string; author: string; rating: number; comment: string }[]
+  total: number
+  average: number
 }
 export interface Catalog {
   items: Nft[]
   total: number
   pages: number
+  categories: { value: string; label: string; count: number }[]
 }
 export interface CartItem {
   nft: Nft

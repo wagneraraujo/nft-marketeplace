@@ -16,7 +16,9 @@ test('visual: início, detalhe, carrinho e pagamento', async ({ page }) => {
     fullPage: true,
     animations: 'disabled',
   })
-  await page.getByRole('button', { name: 'Adicionar ao carrinho' }).click()
+  await page
+    .getByRole('button', { name: 'Comprar NFT: adicionar ao carrinho' })
+    .click()
   await expect(page.getByText('NFT adicionado ao carrinho.')).toBeVisible()
   await page.goto('/cart', { waitUntil: 'domcontentloaded' })
   await expect(page.locator('.cart-item')).toHaveCount(1)

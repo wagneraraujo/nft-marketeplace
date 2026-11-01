@@ -5,21 +5,14 @@ import {
   useNavigate,
   useRouterState,
 } from '@tanstack/react-router'
-import {
-  Heart,
-  LogOut,
-  LogIn,
-  ScanLine,
-  ShieldCheck,
-  Palette,
-  Bell,
-} from 'lucide-react'
+import { Heart, LogOut, LogIn, ScanLine } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useSession } from '@/features/auth/use-session'
 import { logout } from '@/features/auth/session'
 import { cartOptions } from '@/features/cart/queries'
 import { Button } from '@/components/ui/button'
 import { SessionLifecycle } from '@/app/session-lifecycle'
+import { catalogCategories } from '@/contracts'
 export function Brand() {
   return (
     <Link to="/" className="brand" aria-label="Kurio, início">
@@ -31,39 +24,52 @@ export function MarketplaceFooter() {
   return (
     <footer className="market-footer">
       <div className="footer-services">
-        {(
+        {[
           [
-            [
-              ShieldCheck,
-              'Segurança da carteira',
-              'Proteja seus ativos e descubra como evitar riscos.',
-            ],
-            [
-              Palette,
-              'Criadores em destaque',
-              'Conheça artistas, coleções e comunidades que movem a cultura digital.',
-            ],
-            [
-              Bell,
-              'Alertas de lançamentos',
-              'Novidades da comunidade e novas edições em destaque.',
-            ],
-          ] as const
-        ).map(([Icon, title, copy]) => (
+            'W',
+            'Segurança da carteira',
+            'Proteja sua carteira e colecione arte digital com confiança.',
+          ],
+          [
+            'C',
+            'Criadores em destaque',
+            'Conheça artistas, estúdios e comunidades que moldam a cultura digital na rede.',
+          ],
+          [
+            'D',
+            'Alertas de lançamentos',
+            'Receba calendários de cunhagem, novidades de listas de acesso e análises do mercado.',
+          ],
+        ].map(([icon, title, copy]) => (
           <div key={title}>
-            <span className="service-icon">
-              <Icon size={26} />
+            <span className="service-icon" aria-hidden="true">
+              {icon}
             </span>
             <h3>{title}</h3>
             <p>{copy}</p>
           </div>
         ))}
-        <div>
+        <div className="footer-newsletter">
           <h3>Antecipe-se ao próximo lançamento</h3>
-          <p>Explore novas coleções e acompanhe seus favoritos.</p>
-          <Link to="/favorites" className="text-link">
-            Ver meus favoritos →
-          </Link>
+          <div className="newsletter-field">
+            <input
+              type="email"
+              aria-label="E-mail para novidades"
+              placeholder="digite seu e-mail..."
+              disabled
+            />
+            <button
+              type="button"
+              disabled
+              title="Newsletter indisponível nesta demonstração"
+            >
+              Enviar
+            </button>
+          </div>
+          <p>
+            Receba lançamentos selecionados, histórias de criadores e novidades
+            do mercado.
+          </p>
         </div>
       </div>
       <div className="footer-contact">
@@ -80,27 +86,83 @@ export function MarketplaceFooter() {
         <div>
           <h3>Meu perfil</h3>
           <Link to="/profile">Meu perfil</Link>
-          <Link to="/wallets">Minha carteira</Link>
-          <Link to="/orders">Meus pedidos</Link>
+          <Link to="/orders">Minha coleção</Link>
+          <button
+            type="button"
+            disabled
+            title="Atividade indisponível nesta demonstração"
+          >
+            Atividade
+          </button>
+          <button
+            type="button"
+            disabled
+            title="Estúdio indisponível nesta demonstração"
+          >
+            Estúdio do criador
+          </button>
+          <Link to="/favorites">Lista de interesse</Link>
         </div>
         <div>
           <h3>Central de ajuda</h3>
-          <span>Explore, descubra, colecione.</span>
-          <span>Todos os pagamentos são simulados.</span>
+          {[
+            'Central de ajuda',
+            'Como comprar NFTs',
+            'Carteira e segurança',
+            'Política do mercado',
+            'Denunciar item',
+          ].map((label) => (
+            <button
+              key={label}
+              type="button"
+              disabled
+              title="Conteúdo indisponível nesta demonstração"
+            >
+              {label}
+            </button>
+          ))}
         </div>
         <div>
           <h3>Coleções</h3>
-          <Link to="/">Arte digital</Link>
-          <Link to="/">Fotografia</Link>
-          <Link to="/">Colecionáveis</Link>
+          {catalogCategories
+            .filter(({ value }) =>
+              ['Arte', 'Fotografia', 'Música', 'Arte 3D', 'Utilidade'].includes(
+                value,
+              ),
+            )
+            .map(({ value, label }) => (
+              <Link key={value} to="/" search={{ category: value, page: 1 }}>
+                {label}
+              </Link>
+            ))}
         </div>
-        <div>
-          <h3>Kurio</h3>
-          <p>
-            O futuro da cultura digital
-            <br />
-            começa com uma descoberta.
-          </p>
+        <div className="footer-community">
+          <div>
+            <h3>Redes sociais</h3>
+            <div className="footer-social">
+              {[
+                ['Facebook', '/figma/99280.svg'],
+                ['Instagram', '/figma/d48dd.svg'],
+                ['X', '/figma/b4111.svg'],
+                ['LinkedIn', '/figma/b8b84.svg'],
+                ['YouTube', '/figma/ca2da.svg'],
+              ].map(([label, src]) => (
+                <button
+                  type="button"
+                  key={label}
+                  disabled
+                  aria-label={`${label}: perfil indisponível nesta demonstração`}
+                  title={`${label}: perfil não configurado`}
+                >
+                  <AssetIcon src={src} />
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="footer-wallets">
+            <h3>Carteiras compatíveis</h3>
+            <span>METAMASK · WALLETCONNECT · COINBASE</span>
+          </div>
         </div>
       </div>
       <small>© {new Date().getFullYear()} Kurio. Projeto demonstrativo.</small>
@@ -143,7 +205,7 @@ export function Shell() {
             aria-label={`Carrinho, ${count} itens`}
           >
             <AssetIcon src="/figma/c0c08.svg" />
-            {count > 0 && <span>{count}</span>}
+            {count > 0 && <span className="cart-count">{count}</span>}
           </Link>
           {user ? (
             <>

@@ -41,7 +41,9 @@ async function signOut(page: Page) {
 }
 async function addToCart(page: Page) {
   await page.goto('/nfts/nft-1')
-  await page.getByRole('button', { name: 'Adicionar ao carrinho' }).click()
+  await page
+    .getByRole('button', { name: 'Comprar NFT: adicionar ao carrinho' })
+    .click()
   await expect(page.getByText('NFT adicionado ao carrinho.')).toBeVisible()
 }
 async function checkout(page: Page) {
@@ -85,7 +87,10 @@ test('filtros e paginação sobrevivem ao histórico e refresh', async ({
   await expect(page).toHaveURL(/page=2/)
   const filterToggle = page.getByRole('button', { name: 'Mostrar filtros' })
   if (await filterToggle.isVisible()) await filterToggle.click()
-  await page.getByRole('button', { name: /^Arte digital/ }).click()
+  await page
+    .locator('.catalog-sidebar')
+    .getByRole('link', { name: /^Arte digital/ })
+    .click()
   await expect(page).toHaveURL(/page=1/)
   await page.getByLabel('Ordenação').selectOption('price-desc')
   await page.getByLabel('Buscar NFTs').filter({ visible: true }).fill('Emerald')

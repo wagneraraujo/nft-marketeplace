@@ -1,16 +1,19 @@
 import { Minus, Plus } from 'lucide-react'
+import { AssetIcon } from './asset-icon'
 export function QuantityControl({
   value,
   max = 10,
   onChange,
   disabled,
   label,
+  detail = false,
 }: {
   value: number
   max?: number
   onChange: (value: number) => void
   disabled?: boolean
   label: string
+  detail?: boolean
 }) {
   return (
     <div className="quantity-control">
@@ -20,7 +23,20 @@ export function QuantityControl({
         aria-label={`Diminuir edições de ${label}`}
         onClick={() => onChange(value - 1)}
       >
-        <Minus size={12} />
+        {detail ? (
+          <>
+            <AssetIcon
+              className="quantity-desktop-icon"
+              src="/figma/7d18c.svg"
+            />
+            <AssetIcon
+              className="quantity-mobile-icon"
+              src="/figma/dd0fb.svg"
+            />
+          </>
+        ) : (
+          <Minus size={12} />
+        )}
       </button>
       <select
         aria-label={`Quantidade de ${label}`}
@@ -38,7 +54,20 @@ export function QuantityControl({
         aria-label={`Aumentar edições de ${label}`}
         onClick={() => onChange(value + 1)}
       >
-        <Plus size={12} />
+        {detail ? (
+          <>
+            <AssetIcon
+              className="quantity-desktop-icon"
+              src="/figma/a803c.svg"
+            />
+            <AssetIcon
+              className="quantity-mobile-icon"
+              src="/figma/f8641.svg"
+            />
+          </>
+        ) : (
+          <Plus size={12} />
+        )}
       </button>
     </div>
   )
